@@ -1,0 +1,10 @@
+bin/
+.vs/
+obj/
+appsettings.json
+app/*.pfx
+app/*.log
+app/*.txt
+app/package-lock.json
+roadmap.txt
+*.sln
