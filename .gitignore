@@ -8,3 +8,4 @@ app/*.txt
 app/package-lock.json
 roadmap.txt
 *.sln
+app/node_modules
