@@ -21,5 +21,20 @@ namespace Suites.Controllers
             var tenants = await _tenantsService.GetTenants();
             return Ok(tenants);
         }
+
+        [HttpPost]
+        [Route("add")]
+        public async Task<IActionResult> AddTenant([FromBody] AddTenant tenantData)
+        {       
+            try
+            {
+                await _tenantsService.AddTenant(tenantData);
+                return Ok("Tenant Added");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }                     
+        }
     }
 }

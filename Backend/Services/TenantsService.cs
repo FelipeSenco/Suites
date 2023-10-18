@@ -13,6 +13,12 @@ namespace Suites.Services
             _tenantsRepository = tenantsRepository;
         }
 
+        public async Task AddTenant(AddTenant tenant)
+        {
+            var dbTenant = new Tenant() { CellPhone = tenant.CellPhone, Email = tenant.Email, Name = tenant.Name, LastName = tenant.LastName };
+            await _tenantsRepository.AddTenant(dbTenant);
+        }
+
         public async Task<List<Tenant>> GetTenants()
         {
             var tenantList = await _tenantsRepository.GetTenants();

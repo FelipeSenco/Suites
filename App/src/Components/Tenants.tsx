@@ -1,10 +1,13 @@
 import React, { FC, useContext, useEffect, useState } from "react";
 import TenantsContext from "../Administration/Contexts/TenantsContext";
 import { cellPhoneRegex, emailRegex } from "../Types/utils";
+import {
+  useAddTenantMutation,
+  useTenantsQuery,
+} from "../Administration/Api/Queries/tenantQueries";
 
 export const Tenants: FC = () => {
-  const tenantsContext = useContext(TenantsContext);
-  const { tenants } = tenantsContext;
+  const { tenants, isError, isLoading } = useTenantsQuery(true);
 
   return (
     <div>
@@ -47,7 +50,7 @@ export const Tenants: FC = () => {
 };
 
 const AddTenantArea: React.FC = () => {
-  const { addTenant } = useContext(TenantsContext);
+  const { mutateAsync: addTenant, isError, isLoading } = useAddTenantMutation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [name, setName] = useState("");
   const [nameValid, setNameValid] = useState(false);
@@ -70,11 +73,27 @@ const AddTenantArea: React.FC = () => {
     setCellPhoneValid(cellPhoneRegex.test(cellPhone));
   };
 
-  const onSubmitClick = () => {
+  const resetForm = () => {
+    setName("");
+    setLastName("");
+    setEmail("");
+    setCellPhone("");
+  };
+
+  const onSubmitClick = async () => {
     setShowValidationMessages(true);
     const allValid = nameValid && lastNameValid && emailValid && cellPhoneValid;
-    allValid && addTenant({ name, lastName, email, cellPhone });
+    if (allValid) {
+      await addTenant({ name, lastName, email, cellPhone });
+      setShowAddForm(false);
+      if (!isError) {
+        resetForm();
+        setShowValidationMessages(false);
+      }
+    }
   };
+
+  if (isLoading) return <AddTenantLoadingSkeleton />;
 
   return (
     <div className="mt-10 p-5">
@@ -177,16 +196,55 @@ const AddTenantArea: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center items-center mt-5">
+
+          <div className="flex justify-center items-center mt-5 flex-col">
             <button
               onClick={onSubmitClick}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
+              disabled={isLoading}
             >
               Enviar
             </button>
+            {isError && (
+              <p className="text-red-500">
+                Houve um problema ao tentar adicionar esse inquilino. Tente
+                novamente...
+              </p>
+            )}
           </div>
         </>
       )}
+    </div>
+  );
+};
+
+const AddTenantLoadingSkeleton: React.FC = () => {
+  return (
+    <div className="animate-pulse mt-20 p-5">
+      <div className="flex flex-row gap-5">
+        <div className="flex flex-col w-1/2">
+          <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+          <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+        </div>
+
+        <div className="flex flex-col w-1/2">
+          <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+          <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+        </div>
+      </div>
+
+      <div className="flex flex-row gap-5">
+        <div className="flex flex-col w-1/2">
+          <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+          <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+        </div>
+
+        <div className="flex flex-col w-1/2">
+          <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+          <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+        </div>
+      </div>
+      <p className="text-lg">Carregando...</p>
     </div>
   );
 };

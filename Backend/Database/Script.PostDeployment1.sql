@@ -14,9 +14,9 @@ BEGIN
     CREATE TABLE Tenants
     (
         Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-        Name NVARCHAR(255) NOT NULL,
-        LastName NVARCHAR(255) NOT NULL,
-        Email NVARCHAR(255) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        LastName NVARCHAR(100) NOT NULL,
+        Email NVARCHAR(100) NOT NULL,
         CellPhone NVARCHAR(20) NOT NULL
     );
 END;

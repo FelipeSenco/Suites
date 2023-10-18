@@ -4,14 +4,18 @@ import { AdminHome } from "./Administration/AdminHome";
 import { createRoot } from "react-dom/client";
 import { TenantsProvider } from "./Administration/Contexts/TenantsContext";
 import { TenantsApi } from "./Administration/Api/tenantsApi";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const tenantsApi = new TenantsApi();
+const queryClient = new QueryClient();
 
 const App: React.FC = () => {
   return (
-    <TenantsProvider api={tenantsApi}>
-      <AdminHome />
-    </TenantsProvider>
+    <QueryClientProvider client={queryClient}>
+      <TenantsProvider api={tenantsApi}>
+        <AdminHome />
+      </TenantsProvider>
+    </QueryClientProvider>
   );
 };
 
