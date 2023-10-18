@@ -1,11 +1,14 @@
-bin/
-.vs/
-obj/
+*bin/
+*.vs/
+*obj/
 appsettings.json
 app/*.pfx
 app/*.log
 app/*.txt
 app/package-lock.json
+app/dist
 roadmap.txt
 *.sln
 app/node_modules
+*.dbmdl
+*.jfm
