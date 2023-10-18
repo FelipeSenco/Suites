@@ -1,20 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Suites.Repositories;
 using System;
 
 namespace Suites.Services
 {
     public class TenantsService : ITenantsService
     {
-        private readonly SuitesDbContext _context;
+        private readonly ITenantsRepository _tenantsRepository;
 
-        public TenantsService(SuitesDbContext context)
+        public TenantsService(ITenantsRepository tenantsRepository)
         {
-            _context = context;
+            _tenantsRepository = tenantsRepository;
         }
 
         public async Task<List<Tenant>> GetTenants()
         {
-            var tenantList = await _context.Tenants.ToListAsync();
+            var tenantList = await _tenantsRepository.GetTenants();
             return tenantList;
         }
     }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Suites;
+using Suites.Repositories;
 using Suites.Services;
 using System;
 
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<SuitesDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ITenantsService, TenantsService>();
+builder.Services.AddTransient<ITenantsRepository, TenantsRepository>();
 
 builder.Services.AddCors(options =>
 {
