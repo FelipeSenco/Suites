@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import TenantsContext from "../../Contexts/TenantsContext";
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
 export const useTenantsQuery = (enabled = false) => {
   const { getTenants } = useContext(TenantsContext);
@@ -21,42 +21,58 @@ export const useTenantsQuery = (enabled = false) => {
 
 export const useAddTenantMutation = () => {
   const { addTenant } = useContext(TenantsContext);
-  const { refetch } = useTenantsQuery();
+  const queryClient = useQueryClient();
+  const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
 
   return useMutation(addTenant, {
     onError: (error: Error) => {
       console.log(error);
     },
-    onSuccess: (data, variables, context) => {
-      refetch();
+    onSuccess: (data, args, context) => {
+      queryClient.setQueryData(keys.tenants, [
+        ...currentData,
+        { ...args, id: data },
+      ]);
     },
   });
 };
 
 export const useEditTenantMutation = () => {
   const { editTenant } = useContext(TenantsContext);
-  const { refetch } = useTenantsQuery();
+  const queryClient = useQueryClient();
+  const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
 
   return useMutation(editTenant, {
+    onMutate: (args) => {
+      queryClient.setQueryData(
+        keys.tenants,
+        currentData.map((t) => (t.id === args.id ? args : t))
+      );
+      console.log(args);
+    },
     onError: (error: Error) => {
       console.log(error);
-    },
-    onSuccess: (data, variables, context) => {
-      refetch();
+      queryClient.setQueryData(keys.tenants, currentData);
     },
   });
 };
 
 export const useDeleteTenantMutation = () => {
   const { deleteTenant } = useContext(TenantsContext);
-  const { refetch } = useTenantsQuery();
+  const queryClient = useQueryClient();
+  const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
 
   return useMutation(deleteTenant, {
+    onMutate: (args) => {
+      console.log(args);
+      queryClient.setQueryData(
+        keys.tenants,
+        currentData.filter((t) => t.id !== args)
+      );
+    },
     onError: (error: Error) => {
       console.log(error);
-    },
-    onSuccess: (data, variables, context) => {
-      refetch();
+      queryClient.setQueryData(keys.tenants, currentData);
     },
   });
 };

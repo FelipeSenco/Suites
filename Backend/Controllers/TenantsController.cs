@@ -28,8 +28,8 @@ namespace Suites.Controllers
         {       
             try
             {
-                await _tenantsService.AddTenant(tenantData);
-                return Ok("Tenant Added");
+                var guidResponse = await _tenantsService.AddTenant(tenantData);
+                return Ok(guidResponse);
             }
             catch (Exception ex)
             {

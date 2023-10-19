@@ -6,9 +6,12 @@ import { TenantsProvider } from "./Administration/Contexts/TenantsContext";
 import { TenantsApi } from "./Administration/Api/tenantsApi";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Modal from "react-modal";
+import axios from "axios";
 
 const tenantsApi = new TenantsApi();
 const queryClient = new QueryClient();
+axios.defaults.timeout = 5000;
+
 Modal.setAppElement("#root");
 
 const App: React.FC = () => {

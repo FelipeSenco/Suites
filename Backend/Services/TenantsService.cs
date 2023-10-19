@@ -19,10 +19,12 @@ namespace Suites.Services
             return tenantList;
         }
 
-        public async Task AddTenant(AddTenant tenant)
+        public async Task<Guid> AddTenant(AddTenant tenant)
         {
-            var dbTenant = new Tenant() { CellPhone = tenant.CellPhone, Email = tenant.Email, Name = tenant.Name, LastName = tenant.LastName };
+            Guid newTenantGuid = Guid.NewGuid();
+            var dbTenant = new Tenant() {Id = newTenantGuid ,CellPhone = tenant.CellPhone, Email = tenant.Email, Name = tenant.Name, LastName = tenant.LastName };
             await _tenantsRepository.AddTenant(dbTenant);
+            return newTenantGuid;
         }            
 
         public async Task DeleteTenant(Guid tenantId)
