@@ -16,9 +16,7 @@ BEGIN
         Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
         Name NVARCHAR(100) NOT NULL,
         Address NVARCHAR(255) NOT NULL,
-        Rooms INT NULL DEFAULT 0,
-        Tenants INT NULL DEFAULT 0,
-        Vacancies INT NULL DEFAULT 0,
+        Rooms INT NULL DEFAULT 0,   
         SysStartTime datetime2(0) GENERATED ALWAYS AS ROW START NOT NULL,
         SysEndTime datetime2(0) GENERATED ALWAYS AS ROW END NOT NULL,
         PERIOD FOR SYSTEM_TIME (SysStartTime, SysEndTime)

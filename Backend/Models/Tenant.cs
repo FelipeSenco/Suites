@@ -1,5 +1,7 @@
 ﻿
+using Suites.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public class Tenant
 {
@@ -22,4 +24,7 @@ public class Tenant
     [Required]
     [MaxLength(20)]
     public string CellPhone { get; set; }
+
+    [ForeignKey("PropertyId")] // Ensure you've added the ForeignKey attribute.
+    public virtual Property Property { get; set; }
 }
