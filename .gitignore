@@ -13,3 +13,4 @@ app/node_modules
 *.dbmdl
 *.jfm
 /Backend/Database/Database.jfm
+/Backend/Database/Database.jfm
