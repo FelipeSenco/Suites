@@ -59,18 +59,18 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
             </p>
             <div className="flex justify-between gap-3">
               <button
-                onClick={onDeleteConfirm}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
-                disabled={isLoading}
-              >
-                Confirmar
-              </button>
-              <button
                 onClick={() => setOpen(false)}
                 className="bg-red-500 hover:bg-red-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
                 disabled={isLoading}
               >
                 Cancelar
+              </button>
+              <button
+                onClick={onDeleteConfirm}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
+                disabled={isLoading}
+              >
+                Confirmar
               </button>
             </div>
           </>

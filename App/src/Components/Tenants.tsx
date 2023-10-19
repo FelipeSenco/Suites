@@ -22,7 +22,6 @@ export const Tenants: FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold">Administracao Suites Tavares</h1>
       <table className="border-collapse w-full mt-10">
         <thead>
           <tr>
@@ -105,7 +104,7 @@ const AddTenantArea: React.FC = () => {
   if (isLoading) return <AddTenantLoadingSkeleton />;
 
   return (
-    <div className="mt-10 p-5">
+    <div className="mt-4 p-5">
       {!showAddForm && (
         <div className="flex items-center justify-center">
           <button
@@ -354,18 +353,18 @@ const TenantForm: React.FC<TenantFormProps> = ({
       <div className="flex justify-center items-center mt-5 flex-col">
         <div className="flex w-1/2 justify-between">
           <button
-            onClick={onSubmitClick}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
-            disabled={isLoading}
-          >
-            Enviar
-          </button>
-          <button
             onClick={onCancel}
             className="bg-red-500 hover:bg-red-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
             disabled={isLoading}
           >
             Cancelar
+          </button>
+          <button
+            onClick={onSubmitClick}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
+            disabled={isLoading}
+          >
+            Enviar
           </button>
         </div>
         {isError && (

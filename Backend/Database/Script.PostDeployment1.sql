@@ -17,6 +17,21 @@ BEGIN
         Name NVARCHAR(100) NOT NULL,
         LastName NVARCHAR(100) NOT NULL,
         Email NVARCHAR(100) NOT NULL,
-        CellPhone NVARCHAR(20) NOT NULL
+        CellPhone NVARCHAR(20) NOT NULL,
+        PropertyId UNIQUEIDENTIFIER NOT NULL,
+        RoomNumber INT NOT NULL
+    );
+END;
+
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Properties')
+BEGIN
+    CREATE TABLE Properties
+    (
+        Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        Name NVARCHAR(100) NOT NULL,
+        Address NVARCHAR(255) NOT NULL,
+        Rooms INT NULL DEFAULT 0,
+        Tenants INT NULL DEFAULT 0,
+        Vacancies INT NULL DEFAULT 0,
     );
 END;
