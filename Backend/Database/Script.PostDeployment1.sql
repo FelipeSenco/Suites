@@ -9,20 +9,6 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Tenants')
-BEGIN
-    CREATE TABLE Tenants
-    (
-        Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-        Name NVARCHAR(100) NOT NULL,
-        LastName NVARCHAR(100) NOT NULL,
-        Email NVARCHAR(100) NOT NULL,
-        CellPhone NVARCHAR(20) NOT NULL,
-        PropertyId UNIQUEIDENTIFIER NOT NULL,
-        RoomNumber INT NOT NULL
-    );
-END;
-
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Properties')
 BEGIN
     CREATE TABLE Properties
@@ -33,5 +19,27 @@ BEGIN
         Rooms INT NULL DEFAULT 0,
         Tenants INT NULL DEFAULT 0,
         Vacancies INT NULL DEFAULT 0,
-    );
+        SysStartTime datetime2(0) GENERATED ALWAYS AS ROW START NOT NULL,
+        SysEndTime datetime2(0) GENERATED ALWAYS AS ROW END NOT NULL,
+        PERIOD FOR SYSTEM_TIME (SysStartTime, SysEndTime)
+    )
+    WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.PropertiesHistory));
+END;
+
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Tenants')
+BEGIN
+    CREATE TABLE Tenants
+    (
+        Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+        Name NVARCHAR(100) NOT NULL,
+        LastName NVARCHAR(100) NOT NULL,
+        Email NVARCHAR(100) NOT NULL,
+        CellPhone NVARCHAR(20) NOT NULL,
+        PropertyId UNIQUEIDENTIFIER NOT NULL FOREIGN KEY REFERENCES Properties(Id),
+        RoomNumber INT NOT NULL,
+        SysStartTime datetime2(0) GENERATED ALWAYS AS ROW START NOT NULL,
+        SysEndTime datetime2(0) GENERATED ALWAYS AS ROW END NOT NULL,
+        PERIOD FOR SYSTEM_TIME (SysStartTime, SysEndTime)
+    )
+    WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.TenantsHistory));
 END;
