@@ -33,6 +33,34 @@ export const useAddTenantMutation = () => {
   });
 };
 
+export const useEditTenantMutation = () => {
+  const { editTenant } = useContext(TenantsContext);
+  const { refetch } = useTenantsQuery();
+
+  return useMutation(editTenant, {
+    onError: (error: Error) => {
+      console.log(error);
+    },
+    onSuccess: (data, variables, context) => {
+      refetch();
+    },
+  });
+};
+
+export const useDeleteTenantMutation = () => {
+  const { deleteTenant } = useContext(TenantsContext);
+  const { refetch } = useTenantsQuery();
+
+  return useMutation(deleteTenant, {
+    onError: (error: Error) => {
+      console.log(error);
+    },
+    onSuccess: (data, variables, context) => {
+      refetch();
+    },
+  });
+};
+
 const keys = {
   tenants: "tenants",
 };

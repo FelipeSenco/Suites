@@ -9,6 +9,8 @@ export class TenantsApi {
     this.endpoints = {
       getTenants: this.apiUrl + "/api/tenants",
       addTenant: this.apiUrl + "/api/tenants/add",
+      editTenant: this.apiUrl + "/api/tenants/edit",
+      deleteTenant: this.apiUrl + "/api/tenants/delete?id={id}",
     };
   }
 
@@ -19,6 +21,18 @@ export class TenantsApi {
 
   async addTenant(data: AddTenantData): Promise<string> {
     const response = await axios.post(this.endpoints.addTenant, data);
+    return response.data;
+  }
+
+  async editTenant(data: Tenant): Promise<string> {
+    const response = await axios.put(this.endpoints.editTenant, data);
+    return response.data;
+  }
+
+  async deleteTenant(tenantId: string): Promise<string> {
+    const response = await axios.delete(
+      this.endpoints.deleteTenant.replace("{id}", tenantId)
+    );
     return response.data;
   }
 }

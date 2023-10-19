@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Web.Http.Results;
 
 namespace Suites.Repositories
 {
@@ -11,16 +12,43 @@ namespace Suites.Repositories
             _context = context;
         }
 
+        public async Task<List<Tenant>> GetTenants()
+        {
+            var tenantList = await _context.Tenants.OrderBy(t=>t.Name).ToListAsync();
+            return tenantList;
+        }
+
         public async Task AddTenant(Tenant tenant)
         {         
             await _context.Tenants.AddAsync(tenant);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Tenant>> GetTenants()
+        public async Task DeleteTenant(Guid tenantId)
         {
-            var tenantList = await _context.Tenants.ToListAsync();
-            return tenantList;
+            var removeTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == tenantId);
+            if (removeTenant is null)
+            {
+                throw new Exception("No tenant found for the provided id.");
+            }
+             _context.Tenants.Remove(removeTenant);
+            await _context.SaveChangesAsync();
         }
+
+        public async Task EditTenant(Tenant tenant)
+        {
+            var currentTenant = await _context.Tenants.FirstOrDefaultAsync(t => t.Id == tenant.Id);
+            if (currentTenant is null)
+            {
+                throw new Exception("No tenant found for the provided id.");
+            }         
+            currentTenant.Email = tenant.Email;
+            currentTenant.Name = tenant.Name;
+            currentTenant.LastName = tenant.LastName;
+            currentTenant.CellPhone = tenant.CellPhone;
+
+            await _context.SaveChangesAsync();
+        }
+     
     }
 }

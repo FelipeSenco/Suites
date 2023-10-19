@@ -5,9 +5,11 @@ import { createRoot } from "react-dom/client";
 import { TenantsProvider } from "./Administration/Contexts/TenantsContext";
 import { TenantsApi } from "./Administration/Api/tenantsApi";
 import { QueryClient, QueryClientProvider } from "react-query";
+import Modal from "react-modal";
 
 const tenantsApi = new TenantsApi();
 const queryClient = new QueryClient();
+Modal.setAppElement("#root");
 
 const App: React.FC = () => {
   return (

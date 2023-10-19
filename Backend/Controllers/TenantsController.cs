@@ -36,5 +36,35 @@ namespace Suites.Controllers
                 return BadRequest(ex.Message);
             }                     
         }
+
+        [HttpPut]
+        [Route("edit")]
+        public async Task<IActionResult> AddTenant([FromBody] Tenant tenantData)
+        {
+            try
+            {
+                await _tenantsService.EditTenant(tenantData);
+                return Ok("Tenant Edited");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<IActionResult> Delete([FromQuery] Guid id)
+        {
+            try
+            {
+                await _tenantsService.DeleteTenant(id);
+                return Ok("Tenant Deleted");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
