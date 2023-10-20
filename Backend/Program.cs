@@ -19,6 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ITenantsService, TenantsService>();
 builder.Services.AddTransient<ITenantsRepository, TenantsRepository>();
+builder.Services.AddTransient<IPropertiesRepository, PropertiesRepository>();
+builder.Services.AddTransient<IPropertiesService, PropertiesService>();
 
 builder.Services.AddCors(options =>
 {

@@ -14,7 +14,7 @@ namespace Suites.Repositories
 
         public async Task<List<Property>> GetProperties()
         {
-           return await _context.Properties.ToListAsync();
+           return await _context.Properties.Include(p=>p.Tenants).ToListAsync();
         }
     }
 }

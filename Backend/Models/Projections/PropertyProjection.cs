@@ -6,7 +6,7 @@ namespace Suites.Models
     public class PropertyProjection
     {
         [Key]
-        Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(100)]

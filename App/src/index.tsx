@@ -9,10 +9,13 @@ import axios from "axios";
 import { AdminHome } from "./Administration/AdminHome";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Tenants } from "./Components/Tenants";
-import { Properties } from "./Components/Suites";
+import { Properties } from "./Components/Properties";
 import { Payments } from "./Components/Payments";
+import { PropertiesProvider } from "./Administration/Contexts/PropertiesContext";
+import { PropertiesApi } from "./Administration/Api/propertiesApi";
 
 const tenantsApi = new TenantsApi();
+const propertiesApi = new PropertiesApi();
 const queryClient = new QueryClient();
 axios.defaults.timeout = 5000;
 
@@ -47,9 +50,11 @@ const reactRoot = createRoot(root);
 reactRoot.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <TenantsProvider api={tenantsApi}>
-        <RouterProvider router={router} />
-      </TenantsProvider>
+      <PropertiesProvider api={propertiesApi}>
+        <TenantsProvider api={tenantsApi}>
+          <RouterProvider router={router} />
+        </TenantsProvider>
+      </PropertiesProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

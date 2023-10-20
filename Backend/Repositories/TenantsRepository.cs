@@ -41,12 +41,15 @@ namespace Suites.Repositories
             if (currentTenant is null)
             {
                 throw new Exception("No tenant found for the provided id.");
-            }         
+            }
+
+            currentTenant.Id = tenant.Id;
+            currentTenant.CellPhone = tenant.CellPhone;
             currentTenant.Email = tenant.Email;
             currentTenant.Name = tenant.Name;
             currentTenant.LastName = tenant.LastName;
-            currentTenant.CellPhone = tenant.CellPhone;
-
+            currentTenant.PropertyId = new Guid("6F9619FF-8B86-448A-BCFA-2C3C1F2693B9");
+           
             await _context.SaveChangesAsync();
         }
      

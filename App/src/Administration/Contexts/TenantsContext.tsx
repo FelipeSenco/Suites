@@ -3,7 +3,7 @@ import { TenantsApi } from "../Api/tenantsApi";
 
 type TenantsContextType = {
   getTenants: () => Promise<Tenant[]>;
-  tenants: Tenant[];
+
   addTenant: (data: AddTenantData) => Promise<string>;
   editTenant: (data: Tenant) => Promise<string>;
   deleteTenant: (tenantId: string) => Promise<string>;
@@ -11,7 +11,7 @@ type TenantsContextType = {
 
 const TenantsContext = createContext<TenantsContextType>({
   getTenants: () => Promise.resolve([]),
-  tenants: [],
+
   addTenant: () => Promise.resolve(""),
   editTenant: () => Promise.resolve(""),
   deleteTenant: () => Promise.resolve(""),
@@ -26,16 +26,6 @@ export const TenantsProvider: React.FC<TenantsProviderProps> = ({
   children,
   api,
 }) => {
-  const [tenants, setTenants] = useState<Tenant[]>([]);
-
-  useEffect(() => {
-    getTenants()
-      .then((res) => {
-        setTenants(res);
-      })
-      .catch((e) => console.log(e));
-  }, []);
-
   const getTenants = async (): Promise<Tenant[]> => {
     return await api.getTenants();
   };
@@ -59,7 +49,6 @@ export const TenantsProvider: React.FC<TenantsProviderProps> = ({
         addTenant,
         editTenant,
         deleteTenant,
-        tenants,
       }}
     >
       {children}

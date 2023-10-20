@@ -10,6 +10,20 @@ namespace Suites
 
         public SuitesDbContext(DbContextOptions<SuitesDbContext> options) : base(options)
         {
+        }    
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Tenant>()
+                .HasOne(t => t.Property)
+                .WithMany(p => p.Tenants)
+                .HasForeignKey(t => t.PropertyId);
+
+            modelBuilder.Entity<Property>()
+                .HasMany(p => p.Tenants)
+                .WithOne(t => t.Property);          
         }
+
     }
 }

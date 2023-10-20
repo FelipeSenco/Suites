@@ -6,7 +6,7 @@ namespace Suites.Models
     public class Property
     {
         [Key]
-        Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(100)]
@@ -16,6 +16,7 @@ namespace Suites.Models
         [MaxLength(255)]
         public string Address { get; set; }
 
+        [Required]
         [MaxLength(50)]
         public int Rooms { get; set; }
 

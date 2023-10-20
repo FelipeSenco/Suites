@@ -1,8 +1,7 @@
-﻿using Suites.Models;
+﻿
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-public class Tenant
+public class EditTenant
 {
     [Key]
     public Guid Id { get; set; }
@@ -24,14 +23,10 @@ public class Tenant
     [MaxLength(20)]
     public string CellPhone { get; set; }
 
-    [Required]   
+    [Required] 
     public Guid PropertyId { get; set; }
 
     [Required]
-    [MaxLength(50)]
-    [MinLength(1)]
+    [Range(1,50)]
     public int RoomNumber { get; set; }
-
-    [ForeignKey("PropertyId")]
-    public virtual Property Property { get; set; }
 }

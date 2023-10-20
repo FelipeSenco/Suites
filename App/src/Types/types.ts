@@ -4,6 +4,8 @@ type Tenant = {
   lastName: string;
   email: string;
   cellPhone: string;
+  propertyId: string;
+  roomNumber: number;
 };
 
 type AddTenantData = {
@@ -11,4 +13,15 @@ type AddTenantData = {
   lastName: string;
   email: string;
   cellPhone: string;
+  propertyId: string;
+  roomNumber: number;
+};
+
+type Property = {
+  id: string;
+  name: string;
+  address: string;
+  rooms: number;
+  numberOfTenants: number;
+  vacancies: number;
 };

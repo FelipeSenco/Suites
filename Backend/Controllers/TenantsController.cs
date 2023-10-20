@@ -39,7 +39,7 @@ namespace Suites.Controllers
 
         [HttpPut]
         [Route("edit")]
-        public async Task<IActionResult> AddTenant([FromBody] Tenant tenantData)
+        public async Task<IActionResult> AddTenant([FromBody] EditTenant tenantData)
         {
             try
             {

@@ -1,4 +1,10 @@
-import React, { FC, SetStateAction, useEffect, useState } from "react";
+import React, {
+  FC,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { cellPhoneRegex, emailRegex } from "../Types/utils";
 import {
   useAddTenantMutation,
@@ -8,6 +14,8 @@ import {
 } from "../Administration/Api/Queries/TenantQueries";
 import ReactModal from "react-modal";
 import { DeleteConfirmModal } from "./Shared/DeleteConfirmModal";
+import PropertiesContext from "../Administration/Contexts/PropertiesContext";
+import { usePropertiesQuery } from "../Administration/Api/Queries/PropertiesQueries";
 
 export const Tenants: FC = () => {
   const { tenants } = useTenantsQuery(true);
@@ -19,6 +27,11 @@ export const Tenants: FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [currentTenant, setCurrentTenant] = useState<Tenant>(null);
+  const { properties } = usePropertiesQuery();
+
+  const getPropertyName = (id: string) => {
+    return properties.find((p) => p.id === id)?.name;
+  };
 
   return (
     <div>
@@ -29,6 +42,8 @@ export const Tenants: FC = () => {
             <th className="border p-2">Sobrenome</th>
             <th className="border p-2">Email</th>
             <th className="border p-2">Celular</th>
+            <th className="border p-2">Imovel</th>
+            <th className="border p-2">Quarto</th>
             <th className="border p-2 w-1"></th>
             <th className="border p-2 w-1"></th>
           </tr>
@@ -40,6 +55,8 @@ export const Tenants: FC = () => {
               <td className="border p-2">{t.lastName}</td>
               <td className="border p-2">{t.email}</td>
               <td className="border p-2">{t.cellPhone}</td>
+              <td className="border p-2">{getPropertyName(t.propertyId)}</td>
+              <td className="border p-2">{t.roomNumber}</td>
               <td className="border p-2">
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
@@ -95,9 +112,18 @@ const AddTenantArea: React.FC = () => {
     name: string,
     lastName: string,
     email: string,
-    cellPhone: string
+    cellPhone: string,
+    propertyId: string,
+    roomNumber: number
   ) => {
-    await addTenant({ name, lastName, email, cellPhone });
+    await addTenant({
+      name,
+      lastName,
+      email,
+      cellPhone,
+      propertyId,
+      roomNumber,
+    });
     setShowAddForm(false);
   };
 
@@ -149,10 +175,20 @@ const EditTenantModal: React.FC<EditTenantModalProps> = ({
     lastName: string,
     email: string,
     cellPhone: string,
+    propertyId: string,
+    roomNumber: number,
     id?: string
   ) => {
     const tenantId = id || "";
-    await editTenant({ id: tenantId, name, lastName, email, cellPhone });
+    await editTenant({
+      id: tenantId,
+      name,
+      lastName,
+      email,
+      cellPhone,
+      propertyId,
+      roomNumber,
+    });
     !isError && setOpen(false);
   };
 
@@ -210,6 +246,8 @@ type TenantFormProps = {
     lastName: string,
     email: string,
     cellPhone: string,
+    propertyId: string,
+    roomNumber: number,
     id?: string
   ) => Promise<unknown>;
   onCancel: () => void;
@@ -223,6 +261,7 @@ const TenantForm: React.FC<TenantFormProps> = ({
   isLoading,
   currentTenant,
 }) => {
+  const { properties } = usePropertiesQuery();
   const [name, setName] = useState(currentTenant?.name || "");
   const [nameValid, setNameValid] = useState(false);
   const [lastName, setLastName] = useState(currentTenant?.lastName || "");
@@ -231,11 +270,15 @@ const TenantForm: React.FC<TenantFormProps> = ({
   const [emailValid, setEmailValid] = useState(false);
   const [cellPhone, setCellPhone] = useState(currentTenant?.cellPhone || "");
   const [cellPhoneValid, setCellPhoneValid] = useState(false);
+  const [propertyId, setPropertyId] = useState(currentTenant?.propertyId || "");
+  const [roomNumber, setRoomNumber] = useState(currentTenant?.roomNumber);
   const [showValidationmessages, setShowValidationMessages] = useState(false);
+
+  const maxRooms = properties.find((p) => p.id === propertyId)?.rooms;
 
   useEffect(() => {
     validateFields();
-  }, [name, lastName, cellPhone, email]);
+  }, [name, lastName, cellPhone, email, propertyId]);
 
   const validateFields = () => {
     setNameValid(!!name);
@@ -253,9 +296,23 @@ const TenantForm: React.FC<TenantFormProps> = ({
 
   const onSubmitClick = async () => {
     setShowValidationMessages(true);
-    const allValid = nameValid && lastNameValid && emailValid && cellPhoneValid;
+    const allValid =
+      nameValid &&
+      lastNameValid &&
+      emailValid &&
+      cellPhoneValid &&
+      !!propertyId &&
+      !!roomNumber;
     if (allValid) {
-      await onSubmit(name, lastName, email, cellPhone, currentTenant?.id);
+      await onSubmit(
+        name,
+        lastName,
+        email,
+        cellPhone,
+        propertyId,
+        roomNumber,
+        currentTenant?.id
+      );
       if (!isError) {
         resetForm();
         setShowValidationMessages(false);
@@ -348,10 +405,71 @@ const TenantForm: React.FC<TenantFormProps> = ({
             )}
           </div>
         </div>
+        <div className="flex flex-row gap-5">
+          <div className="flex flex-col w-1/2">
+            <label htmlFor="property" className="text-gray-700 font-bold mb-1">
+              Imovel
+            </label>
+            <select
+              className="border rounded p-2 w-full focus:border-blue-500"
+              id="property"
+              onChange={(e) => {
+                setPropertyId(e.currentTarget.value);
+              }}
+              value={propertyId}
+              placeholder="Escolha um imovel"
+            >
+              <option key={"empty"} value={""}>
+                Escolha um imovel
+              </option>
+              {properties.map((property) => (
+                <option key={property.id} value={property.id}>
+                  {property.name}
+                </option>
+              ))}
+            </select>
+            {showValidationmessages && !propertyId && (
+              <p className="text-red-500">Imovel eh necessario</p>
+            )}
+          </div>
+          <div className="flex flex-col w-1/2">
+            <label
+              htmlFor="roomNumber"
+              className="text-gray-700 font-bold mb-1"
+            >
+              Numero do Quarto
+              <span className="text-gray-500 font-normal text-sm mb-1">
+                {propertyId
+                  ? `Escolha um quarto de 1 a ${maxRooms}`
+                  : "Escolha um imovel antes do quarto"}
+              </span>
+            </label>
+            <input
+              type="number"
+              id="roomNumber"
+              name="roomNumber"
+              max={maxRooms}
+              min={1}
+              required
+              className="border rounded p-2 w-full focus:border-blue-500"
+              value={roomNumber || 0}
+              onChange={(e) => {
+                let i = parseInt(e.target.value);
+                i = i > maxRooms ? maxRooms : i;
+                i = i < 1 ? 1 : i;
+                setRoomNumber(i);
+              }}
+              disabled={!propertyId}
+            />
+            {showValidationmessages && !roomNumber && (
+              <p className="text-red-500">Quarto eh necessario</p>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-center items-center mt-5 flex-col">
-        <div className="flex w-1/2 justify-between">
+        <div className="flex w-1/2 justify-center gap-10">
           <button
             onClick={onCancel}
             className="bg-red-500 hover:bg-red-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"

@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import TenantsContext from "../../Contexts/TenantsContext";
 import { useMutation, useQuery, useQueryClient } from "react-query";
+import { propertiesKeys, usePropertiesQuery } from "./PropertiesQueries";
 
 export const useTenantsQuery = (enabled = false) => {
   const { getTenants } = useContext(TenantsContext);
@@ -23,6 +24,7 @@ export const useAddTenantMutation = () => {
   const { addTenant } = useContext(TenantsContext);
   const queryClient = useQueryClient();
   const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
+  const { refetch: refetchProperties } = usePropertiesQuery();
 
   return useMutation(addTenant, {
     onError: (error: Error) => {
@@ -33,6 +35,7 @@ export const useAddTenantMutation = () => {
         ...currentData,
         { ...args, id: data },
       ]);
+      refetchProperties();
     },
   });
 };
@@ -48,7 +51,6 @@ export const useEditTenantMutation = () => {
         keys.tenants,
         currentData.map((t) => (t.id === args.id ? args : t))
       );
-      console.log(args);
     },
     onError: (error: Error) => {
       console.log(error);
@@ -61,10 +63,10 @@ export const useDeleteTenantMutation = () => {
   const { deleteTenant } = useContext(TenantsContext);
   const queryClient = useQueryClient();
   const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
+  const { refetch: refetchProperties } = usePropertiesQuery();
 
   return useMutation(deleteTenant, {
     onMutate: (args) => {
-      console.log(args);
       queryClient.setQueryData(
         keys.tenants,
         currentData.filter((t) => t.id !== args)
@@ -73,6 +75,9 @@ export const useDeleteTenantMutation = () => {
     onError: (error: Error) => {
       console.log(error);
       queryClient.setQueryData(keys.tenants, currentData);
+    },
+    onSuccess: () => {
+      refetchProperties();
     },
   });
 };
