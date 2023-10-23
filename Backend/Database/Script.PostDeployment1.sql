@@ -21,8 +21,16 @@ BEGIN
         SysEndTime datetime2(0) GENERATED ALWAYS AS ROW END NOT NULL,
         PERIOD FOR SYSTEM_TIME (SysStartTime, SysEndTime)
     )
-    WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.PropertiesHistory));
+    WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.PropertiesHistory));    
+    
+    -- Insert the data
+    INSERT INTO Properties (Id, Name, Address, Rooms)
+    VALUES
+        (NEWID(), 'Bustamante', 'Rua Bustamante 343, Chacara Santo Antonio, Sao Paulo - SP, 04312-012', 12),
+        (NEWID(), 'Bento Barbosa', 'Rua Bento Barbosa 222, Chacara Santo Antonio, Sao Paulo - SP, 04111-050', 8),
+        (NEWID(), 'Ramada', 'Rua Ramada 111, Chacara Santo Antonio, Sao Paulo - SP, 03017-012', 9);
 END;
+
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Tenants')
 BEGIN
