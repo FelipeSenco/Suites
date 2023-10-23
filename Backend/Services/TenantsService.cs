@@ -49,7 +49,8 @@ namespace Suites.Services
                 Email = tenant.Email,
                 Name = tenant.Name,
                 LastName = tenant.LastName,
-                PropertyId = new Guid("6F9619FF-8B86-448A-BCFA-2C3C1F2693B9")
+                PropertyId = tenant.PropertyId,
+                RoomNumber = tenant.RoomNumber,
             };
             await _tenantsRepository.EditTenant(dbTenant);
         }

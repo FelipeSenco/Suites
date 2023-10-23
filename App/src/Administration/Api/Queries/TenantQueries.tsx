@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import TenantsContext from "../../Contexts/TenantsContext";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { propertiesKeys, usePropertiesQuery } from "./PropertiesQueries";
+import { usePropertiesQuery } from "./PropertiesQueries";
 
 export const useTenantsQuery = (enabled = false) => {
   const { getTenants } = useContext(TenantsContext);
@@ -31,10 +31,8 @@ export const useAddTenantMutation = () => {
       console.log(error);
     },
     onSuccess: (data, args, context) => {
-      queryClient.setQueryData(keys.tenants, [
-        ...currentData,
-        { ...args, id: data },
-      ]);
+      const newTenant = { ...args, id: data };
+      queryClient.setQueryData(keys.tenants, [...currentData, newTenant]);
       refetchProperties();
     },
   });
@@ -44,6 +42,7 @@ export const useEditTenantMutation = () => {
   const { editTenant } = useContext(TenantsContext);
   const queryClient = useQueryClient();
   const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
+  const { refetch: refetchProperties } = usePropertiesQuery();
 
   return useMutation(editTenant, {
     onMutate: (args) => {
@@ -55,6 +54,9 @@ export const useEditTenantMutation = () => {
     onError: (error: Error) => {
       console.log(error);
       queryClient.setQueryData(keys.tenants, currentData);
+    },
+    onSuccess: () => {
+      refetchProperties();
     },
   });
 };

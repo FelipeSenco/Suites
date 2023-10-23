@@ -48,7 +48,8 @@ namespace Suites.Repositories
             currentTenant.Email = tenant.Email;
             currentTenant.Name = tenant.Name;
             currentTenant.LastName = tenant.LastName;
-            currentTenant.PropertyId = new Guid("6F9619FF-8B86-448A-BCFA-2C3C1F2693B9");
+            currentTenant.PropertyId = tenant.PropertyId;
+            currentTenant.RoomNumber = tenant.RoomNumber;
            
             await _context.SaveChangesAsync();
         }
