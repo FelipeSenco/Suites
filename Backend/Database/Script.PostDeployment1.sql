@@ -52,7 +52,7 @@ END;
 
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Payments')
 BEGIN
-    CREATE TABLE Tenants
+    CREATE TABLE Payments
     (
         Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
         TenantId UNIQUEIDENTIFIER NOT NULL FOREIGN KEY REFERENCES Tenants(Id),
@@ -60,6 +60,7 @@ BEGIN
         DateOfPayment DATE NOT NULL,
         ReferenceMonth INT NOT NULL, 
         ReferenceYear VARCHAR(5) NOT NULL,
+        Receipt VARCHAR(MAX) NULL,
         SysStartTime datetime2(0) GENERATED ALWAYS AS ROW START NOT NULL,
         SysEndTime datetime2(0) GENERATED ALWAYS AS ROW END NOT NULL,
         PERIOD FOR SYSTEM_TIME (SysStartTime, SysEndTime)

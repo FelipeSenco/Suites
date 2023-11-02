@@ -21,6 +21,8 @@ builder.Services.AddTransient<ITenantsService, TenantsService>();
 builder.Services.AddTransient<ITenantsRepository, TenantsRepository>();
 builder.Services.AddTransient<IPropertiesRepository, PropertiesRepository>();
 builder.Services.AddTransient<IPropertiesService, PropertiesService>();
+builder.Services.AddTransient<IPaymentsService, PaymentsService>();
+builder.Services.AddTransient<IPaymentRepository, PaymentsRepository>();
 
 builder.Services.AddCors(options =>
 {
