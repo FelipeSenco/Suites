@@ -24,7 +24,7 @@ export class TenantsApi {
     return response.data;
   }
 
-  async editTenant(data: Tenant): Promise<string> {
+  async editTenant(data: EditTenantData): Promise<string> {
     const response = await axios.put(this.endpoints.editTenant, data);
     return response.data;
   }

@@ -5,7 +5,7 @@ type TenantsContextType = {
   getTenants: () => Promise<Tenant[]>;
 
   addTenant: (data: AddTenantData) => Promise<string>;
-  editTenant: (data: Tenant) => Promise<string>;
+  editTenant: (data: EditTenantData) => Promise<string>;
   deleteTenant: (tenantId: string) => Promise<string>;
 };
 
@@ -34,7 +34,7 @@ export const TenantsProvider: React.FC<TenantsProviderProps> = ({
     return await api.addTenant(data);
   };
 
-  const editTenant = async (data: Tenant) => {
+  const editTenant = async (data: EditTenantData) => {
     return await api.editTenant(data);
   };
 

@@ -22,17 +22,15 @@ export const useTenantsQuery = (enabled = false) => {
 
 export const useAddTenantMutation = () => {
   const { addTenant } = useContext(TenantsContext);
-  const queryClient = useQueryClient();
-  const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
   const { refetch: refetchProperties } = usePropertiesQuery();
+  const { refetch } = useTenantsQuery();
 
   return useMutation(addTenant, {
     onError: (error: Error) => {
       console.log(error);
     },
     onSuccess: (data, args, context) => {
-      const newTenant = { ...args, id: data };
-      queryClient.setQueryData(keys.tenants, [...currentData, newTenant]);
+      refetch();
       refetchProperties();
     },
   });
@@ -43,20 +41,16 @@ export const useEditTenantMutation = () => {
   const queryClient = useQueryClient();
   const currentData: Tenant[] = queryClient.getQueryData(keys.tenants);
   const { refetch: refetchProperties } = usePropertiesQuery();
+  const { refetch } = useTenantsQuery();
 
   return useMutation(editTenant, {
-    onMutate: (args) => {
-      queryClient.setQueryData(
-        keys.tenants,
-        currentData.map((t) => (t.id === args.id ? args : t))
-      );
-    },
     onError: (error: Error) => {
       console.log(error);
       queryClient.setQueryData(keys.tenants, currentData);
     },
     onSuccess: () => {
       refetchProperties();
+      refetch();
     },
   });
 };

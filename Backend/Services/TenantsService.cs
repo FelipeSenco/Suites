@@ -7,16 +7,34 @@ namespace Suites.Services
     public class TenantsService : ITenantsService
     {
         private readonly ITenantsRepository _tenantsRepository;
+        private readonly IPropertiesRepository _propertiesRepository;
 
-        public TenantsService(ITenantsRepository tenantsRepository)
+        public TenantsService(ITenantsRepository tenantsRepository, IPropertiesRepository propertiesRepository)
         {
             _tenantsRepository = tenantsRepository;
+            _propertiesRepository = propertiesRepository;
         }
 
-        public async Task<List<Tenant>> GetTenants()
+        public async Task<List<TenantProjection>> GetTenants()
         {
-            var tenantList = await _tenantsRepository.GetTenants();
-            return tenantList;
+            var result = new List<TenantProjection>();
+            var dbTenantList = await _tenantsRepository.GetTenants();
+            var properties = await _propertiesRepository.GetProperties();
+            foreach ( var dbTenant in dbTenantList )
+            {
+                result.Add( new TenantProjection()
+                {
+                    Id = dbTenant.Id,
+                    Name = dbTenant.Name,
+                    LastName = dbTenant.LastName,
+                    Email = dbTenant.Email,
+                    CellPhone = dbTenant.CellPhone,
+                    PropertyId = dbTenant.PropertyId,
+                    PropertyName = properties.FirstOrDefault(p => p.Id == dbTenant.PropertyId).Name,
+                    RoomNumber = dbTenant.RoomNumber,
+                });
+            }
+            return result;
         }
 
         public async Task<Guid> AddTenant(AddTenant tenant)

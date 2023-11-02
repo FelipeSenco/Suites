@@ -1,10 +1,4 @@
-import React, {
-  FC,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { FC, SetStateAction, useEffect, useState } from "react";
 import { cellPhoneRegex, emailRegex } from "../Types/utils";
 import {
   useAddTenantMutation,
@@ -14,7 +8,6 @@ import {
 } from "../Administration/Api/Queries/TenantQueries";
 import ReactModal from "react-modal";
 import { DeleteConfirmModal } from "./Shared/DeleteConfirmModal";
-import PropertiesContext from "../Administration/Contexts/PropertiesContext";
 import { usePropertiesQuery } from "../Administration/Api/Queries/PropertiesQueries";
 
 export const Tenants: FC = () => {
@@ -28,10 +21,6 @@ export const Tenants: FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [currentTenant, setCurrentTenant] = useState<Tenant>(null);
   const { properties } = usePropertiesQuery();
-
-  const getPropertyName = (id: string) => {
-    return properties.find((p) => p.id === id)?.name;
-  };
 
   return (
     <div>
@@ -55,7 +44,7 @@ export const Tenants: FC = () => {
               <td className="border p-2">{t.lastName}</td>
               <td className="border p-2">{t.email}</td>
               <td className="border p-2">{t.cellPhone}</td>
-              <td className="border p-2">{getPropertyName(t.propertyId)}</td>
+              <td className="border p-2">{t.propertyName}</td>
               <td className="border p-2">{t.roomNumber}</td>
               <td className="border p-2">
                 <button

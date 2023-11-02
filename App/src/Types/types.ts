@@ -5,10 +5,21 @@ type Tenant = {
   email: string;
   cellPhone: string;
   propertyId: string;
+  propertyName: string;
   roomNumber: number;
 };
 
 type AddTenantData = {
+  name: string;
+  lastName: string;
+  email: string;
+  cellPhone: string;
+  propertyId: string;
+  roomNumber: number;
+};
+
+type EditTenantData = {
+  id: string;
   name: string;
   lastName: string;
   email: string;
@@ -24,4 +35,18 @@ type Property = {
   rooms: number;
   numberOfTenants: number;
   vacancies: number;
+};
+
+type Payment = {
+  id: string;
+  tenantId: string;
+  tenantName: string;
+  tenantLastName: string;
+  propertyName: string;
+  roomNumber: string;
+  amount: number;
+  dateOfPayment: Date;
+  referenceMonth: number;
+  referenceYear: string;
+  receipt?: string;
 };
