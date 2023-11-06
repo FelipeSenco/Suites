@@ -13,9 +13,14 @@ import { Properties } from "./Components/Properties";
 import { Payments } from "./Components/Payments";
 import { PropertiesProvider } from "./Administration/Contexts/PropertiesContext";
 import { PropertiesApi } from "./Administration/Api/propertiesApi";
+import PaymentsContext, {
+  PaymentsProvider,
+} from "./Administration/Contexts/PaymentsContext";
+import { PaymentsApi } from "./Administration/Api/paymentsApi";
 
 const tenantsApi = new TenantsApi();
 const propertiesApi = new PropertiesApi();
+const paymentsApi = new PaymentsApi();
 const queryClient = new QueryClient();
 axios.defaults.timeout = 5000;
 
@@ -52,7 +57,9 @@ reactRoot.render(
     <QueryClientProvider client={queryClient}>
       <PropertiesProvider api={propertiesApi}>
         <TenantsProvider api={tenantsApi}>
-          <RouterProvider router={router} />
+          <PaymentsProvider api={paymentsApi}>
+            <RouterProvider router={router} />
+          </PaymentsProvider>
         </TenantsProvider>
       </PropertiesProvider>
     </QueryClientProvider>

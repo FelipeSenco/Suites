@@ -1,12 +1,32 @@
-﻿using Suites.Models.Api;
+﻿using Suites.Models;
+using Suites.Models.Api;
+using Suites.Repositories;
 
 namespace Suites.Services
 {
     public class PaymentsService : IPaymentsService
     {
-        public Task<Guid> AddPayment(AddPayment payment)
+        private readonly IPaymentRepository _paymenRepository;
+
+        public PaymentsService(IPaymentRepository paymenRepository)
         {
-            throw new NotImplementedException();
+            _paymenRepository = paymenRepository;
+        }
+        public async Task<Guid> AddPayment(AddPayment payment)
+        {
+            Guid newGuid = Guid.NewGuid();
+            var dbPayment = new Payment()
+            {
+                Id = newGuid,
+                TenantId = payment.TenantId,
+                Amount = payment.Amount,
+                DateOfPayment = payment.DateOfPayment,
+                ReferenceMonth = payment.ReferenceMonth,
+                ReferenceYear = payment.ReferenceYear,
+                Receipt = !string.IsNullOrWhiteSpace(payment.Receipt) ? payment.Receipt : null,              
+            };
+            await _paymenRepository.AddPayment(dbPayment);
+            return newGuid;
         }
 
         public Task DeletePayment(Guid paymentId)

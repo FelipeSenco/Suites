@@ -50,3 +50,12 @@ type Payment = {
   referenceYear: string;
   receipt?: string;
 };
+
+type AddPaymentData = {
+  tenantId: string;
+  amount: number;
+  dateOfPayment: Date;
+  referenceMonth: number;
+  referenceYear: string;
+  receipt?: string;
+};

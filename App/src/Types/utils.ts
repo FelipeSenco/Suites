@@ -15,5 +15,3 @@ export const Months = {
   Novembro: 11,
   Dezembro: 12,
 };
-
-const years = Array.from({ length: 49 }, (_, i) => (2022 + i).toString());

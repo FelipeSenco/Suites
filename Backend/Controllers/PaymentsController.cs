@@ -18,7 +18,15 @@ namespace Suites.Controllers
         [Route("add")]
         public async Task<IActionResult> AddPayment([FromBody] AddPayment payment)
         {
-            return Ok();
+            try
+            {
+                var guidResponse = await _paymentService.AddPayment(payment);
+                return Ok(guidResponse);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

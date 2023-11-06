@@ -1,15 +1,27 @@
-import React, { FC, useState } from "react";
+import React, { FC, SetStateAction, useEffect, useState } from "react";
 
 import { useTenantsQuery } from "../Administration/Api/Queries/TenantQueries";
 import MonthSelect from "./Shared/MonthSelect";
 import YearSelect from "./Shared/YearsSelect";
+import ReactModal from "react-modal";
+import { AddTenantLoadingSkeleton } from "./Tenants";
+import { useAddPaymentMutation } from "../Administration/Api/Queries/PaymentsQueries";
 
 export const Payments: FC = () => {
   const payments: Payment[] = [];
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   return (
     <div>
-      <table className="border-collapse w-full mt-10">
+      <div className="flex items-center justify-center mt-5">
+        <button
+          onClick={() => setAddModalOpen(true)}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold text-lg py-2 px-8 rounded"
+        >
+          Adicionar
+        </button>
+      </div>
+      <table className="border-collapse w-full mt-5">
         <thead>
           <tr>
             <th className="border p-2">Nome</th>
@@ -58,7 +70,7 @@ export const Payments: FC = () => {
           ))} */}
         </tbody>
       </table>
-      <AddPaymentForm />
+      <AddPaymentModal open={addModalOpen} setOpen={setAddModalOpen} />
 
       {/* {deleteModalOpen && (
         <DeleteConfirmModal
@@ -73,21 +85,74 @@ export const Payments: FC = () => {
   );
 };
 
-type AddPaymentFormProps = {
+type PaymentFormProps = {
   currentPayment?: Payment;
+  onCancel: () => void;
+  onSubmit: (
+    tenantId: string,
+    amount: number,
+    dateOfPayment: Date,
+    referenceMonth: number,
+    referenceYear: string,
+    receipt?: string,
+    id?: string
+  ) => Promise<unknown>;
+  isLoading: boolean;
+  isError: boolean;
 };
 
-export const AddPaymentForm: FC<AddPaymentFormProps> = ({ currentPayment }) => {
-  const { tenants } = useTenantsQuery();
+export const PaymentForm: FC<PaymentFormProps> = ({
+  currentPayment,
+  onCancel,
+  onSubmit,
+  isLoading,
+  isError,
+}) => {
+  const { tenants } = useTenantsQuery(true);
   const [tenantId, setTenantId] = useState(currentPayment?.tenantId || "");
   const [amount, setAmount] = useState(currentPayment?.amount || 0);
   const [dateOfPayment, setDateOfPayment] = useState(
     currentPayment?.dateOfPayment || ""
   );
-  const [month, setMonth] = useState(currentPayment?.referenceMonth || 0);
-  const [year, setYear] = useState(currentPayment?.referenceYear || "");
+  const [month, setMonth] = useState(currentPayment?.referenceMonth || 1);
+  const [year, setYear] = useState(
+    currentPayment?.referenceYear || new Date().getFullYear().toString()
+  );
   const [receipt, setReceipt] = useState(currentPayment?.receipt || "");
   const [showValidationmessages, setShowValidationMessages] = useState(false);
+
+  const allValid =
+    !!tenantId && !!amount && !!dateOfPayment && !!month && !!year;
+
+  const resetForm = () => {
+    setTenantId("");
+    setAmount(0);
+    setDateOfPayment(new Date(Date.now()));
+    setMonth(0);
+    setYear("");
+    setReceipt("");
+  };
+
+  const onSubmitClick = async () => {
+    setShowValidationMessages(true);
+    if (allValid) {
+      await onSubmit(
+        tenantId,
+        amount,
+        new Date(dateOfPayment),
+        month,
+        year,
+        receipt,
+        currentPayment?.id
+      );
+      if (!isError) {
+        resetForm();
+        setShowValidationMessages(false);
+      }
+    }
+  };
+
+  if (isLoading) return <AddTenantLoadingSkeleton />;
 
   return (
     <div className="p-5">
@@ -104,7 +169,7 @@ export const AddPaymentForm: FC<AddPaymentFormProps> = ({ currentPayment }) => {
                 setTenantId(e.currentTarget.value);
               }}
               value={tenantId}
-              placeholder="Escolha um imovel"
+              placeholder="Escolha um inquilino"
             >
               <option key={"empty"} value={""}>
                 Escolha um inquilino
@@ -183,8 +248,112 @@ export const AddPaymentForm: FC<AddPaymentFormProps> = ({ currentPayment }) => {
           <label htmlFor="receipt" className="text-gray-700 font-bold mb-1">
             Comprovante:
           </label>
+          <input
+            type="file"
+            id="receipt"
+            accept=".png"
+            onChange={(e) => {
+              setReceipt(e.target.value);
+              console.log(receipt);
+            }}
+          />
         </div>
       </div>
+      <div className="flex justify-center items-center mt-5 flex-col">
+        <div className="flex w-1/2 justify-center gap-10">
+          <button
+            onClick={onCancel}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
+            disabled={isLoading}
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onSubmitClick}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
+            disabled={isLoading}
+          >
+            Enviar
+          </button>
+        </div>
+        {isError && (
+          <p className="text-red-500">
+            Houve um problema ao tentar salvar. Tente novamente...
+          </p>
+        )}
+      </div>
     </div>
+  );
+};
+
+type AddPaymentModalProps = {
+  open: boolean;
+  setOpen: React.Dispatch<SetStateAction<boolean>>;
+};
+
+const AddPaymentModal: React.FC<AddPaymentModalProps> = ({ open, setOpen }) => {
+  const {
+    mutateAsync: addPayment,
+    isError,
+    isLoading,
+  } = useAddPaymentMutation();
+
+  const onSubmitClick = async (
+    tenantId: string,
+    amount: number,
+    dateOfPayment: Date,
+    referenceMonth: number,
+    referenceYear: string,
+    receipt?: string
+  ) => {
+    await addPayment({
+      tenantId,
+      amount,
+      dateOfPayment,
+      referenceMonth,
+      referenceYear,
+      receipt,
+    });
+    !isError && setOpen(false);
+  };
+
+  return (
+    <ReactModal
+      isOpen={open}
+      style={{
+        overlay: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        content: {
+          position: "relative",
+          overflow: "auto",
+          WebkitOverflowScrolling: "touch",
+          outline: "none",
+          padding: "20px",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+          background: "#fff",
+          top: "auto",
+          left: "auto",
+          right: "auto",
+          bottom: "auto",
+          width: "80%",
+          height: "50%",
+        },
+      }}
+    >
+      <div className="h-48">
+        <p className="py-5">Adicionar inquilino:</p>
+        <PaymentForm
+          currentPayment={null}
+          onCancel={() => setOpen(false)}
+          onSubmit={onSubmitClick}
+          isLoading={isLoading}
+          isError={isError}
+        />
+      </div>
+    </ReactModal>
   );
 };

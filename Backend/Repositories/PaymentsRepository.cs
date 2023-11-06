@@ -4,9 +4,15 @@ namespace Suites.Repositories
 {
     public class PaymentsRepository : IPaymentRepository
     {
-        public Task AddPayment(Payment payment)
+        private readonly SuitesDbContext _dbContext;
+        public PaymentsRepository(SuitesDbContext context)
         {
-            throw new NotImplementedException();
+            _dbContext = context;
+        }
+        public async Task AddPayment(Payment payment)
+        {
+            await _dbContext.Payments.AddAsync(payment);
+            await _dbContext.SaveChangesAsync();
         }
 
         public Task DeletePayment(Guid paymentId)

@@ -18,13 +18,21 @@ export const Tenants: FC = () => {
     isError: isDeleteError,
   } = useDeleteTenantMutation();
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [currentTenant, setCurrentTenant] = useState<Tenant>(null);
-  const { properties } = usePropertiesQuery();
 
   return (
     <div>
-      <table className="border-collapse w-full mt-10">
+      <div className="flex items-center justify-center mt-5">
+        <button
+          onClick={() => setAddModalOpen(true)}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold text-lg py-2 px-8 rounded"
+        >
+          Adicionar
+        </button>
+      </div>
+      <table className="border-collapse w-full mt-5">
         <thead>
           <tr>
             <th className="border p-2">Nome</th>
@@ -72,7 +80,9 @@ export const Tenants: FC = () => {
           ))}
         </tbody>
       </table>
-      <AddTenantArea />
+      {addModalOpen && (
+        <AddTenantModal open={addModalOpen} setOpen={setAddModalOpen} />
+      )}
       {editModalOpen && (
         <EditTenantModal
           open={editModalOpen}
@@ -139,6 +149,73 @@ const AddTenantArea: React.FC = () => {
         />
       )}
     </div>
+  );
+};
+
+type AddTenantModalProps = {
+  open: boolean;
+  setOpen: React.Dispatch<SetStateAction<boolean>>;
+};
+
+const AddTenantModal: React.FC<AddTenantModalProps> = ({ open, setOpen }) => {
+  const { mutateAsync: addTenant, isError, isLoading } = useAddTenantMutation();
+
+  const onSubmitClick = async (
+    name: string,
+    lastName: string,
+    email: string,
+    cellPhone: string,
+    propertyId: string,
+    roomNumber: number
+  ) => {
+    await addTenant({
+      name,
+      lastName,
+      email,
+      cellPhone,
+      propertyId,
+      roomNumber,
+    });
+    !isError && setOpen(false);
+  };
+
+  return (
+    <ReactModal
+      isOpen={open}
+      style={{
+        overlay: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        content: {
+          position: "relative",
+          overflow: "auto",
+          WebkitOverflowScrolling: "touch",
+          outline: "none",
+          padding: "20px",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+          background: "#fff",
+          top: "auto",
+          left: "auto",
+          right: "auto",
+          bottom: "auto",
+          width: "80%",
+          height: "50%",
+        },
+      }}
+    >
+      <div className="h-48">
+        <p className="py-5">Adicionar inquilino:</p>
+        <TenantForm
+          onSubmit={onSubmitClick}
+          onCancel={() => setOpen(false)}
+          isError={isError}
+          isLoading={isLoading}
+        />
+      </div>
+    </ReactModal>
   );
 };
 
@@ -484,7 +561,7 @@ const TenantForm: React.FC<TenantFormProps> = ({
   );
 };
 
-const AddTenantLoadingSkeleton: React.FC = () => {
+export const AddTenantLoadingSkeleton: React.FC = () => {
   return (
     <div className="animate-pulse mt-20 p-5">
       <div className="flex flex-row gap-5">

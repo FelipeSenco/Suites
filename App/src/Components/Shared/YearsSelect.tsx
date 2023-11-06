@@ -6,7 +6,7 @@ type YearSelectProps = {
 };
 
 const YearSelect: React.FC<YearSelectProps> = ({ year, setYear }) => {
-  const years = Array.from({ length: 49 }, (_, i) => (2022 + i).toString());
+  const years = Array.from({ length: 49 }, (_, i) => (2023 + i).toString());
 
   return (
     <select
