@@ -21,6 +21,6 @@ public class PaymentProjection
     public int ReferenceMonth { get; set; }
 
     public string ReferenceYear { get; set; }
-
-    public string Receipt { get; set; } 
+    public int HasReceipt { get; set; }
+  
 }

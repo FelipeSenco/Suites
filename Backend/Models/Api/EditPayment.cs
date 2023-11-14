@@ -21,8 +21,6 @@ namespace Suites.Models.Api
 
         [Required]
         [StringLength(5)]
-        public string ReferenceYear { get; set; }
-
-        public string Receipt { get; set; }
+        public string ReferenceYear { get; set; }     
     }
 }

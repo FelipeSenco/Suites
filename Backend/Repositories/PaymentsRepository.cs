@@ -52,9 +52,9 @@ namespace Suites.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<List<Payment>> GetPayments()
+        public async Task<List<PaymentProjection>> GetPayments()
         {
-           return await _context.Payments.Include(p=>p.Tenant).Include(p=>p.Tenant.Property).ToListAsync();
+           return await _context.Set<PaymentProjection>().FromSqlRaw("EXEC GetPaymentsProjections").ToListAsync();
         }
     }
 }

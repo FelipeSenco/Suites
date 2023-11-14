@@ -11,6 +11,8 @@ export class PaymentsApi {
       getPayments: this.apiUrl + "/api/payments",
       editPayment: this.apiUrl + "/api/payments/edit",
       deletePayment: this.apiUrl + "/api/payments/delete?id={id}",
+      getReceipt: this.apiUrl + "/api/payments/receipt?id={id}",
+      addReceipt: this.apiUrl + "/api/payments/receipt/add",
     };
   }
 
@@ -33,6 +35,18 @@ export class PaymentsApi {
     const response = await axios.delete(
       this.endpoints.deletePayment.replace("{id}", id)
     );
+    return response.data;
+  }
+
+  async getReceipt(id: string): Promise<Receipt> {
+    const response = await axios.get(
+      this.endpoints.getReceipt.replace("{id}", id)
+    );
+    return response.data;
+  }
+
+  async addReceipt(data: Receipt): Promise<string> {
+    const response = await axios.post(this.endpoints.addReceipt, data);
     return response.data;
   }
 }

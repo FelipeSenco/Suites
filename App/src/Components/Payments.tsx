@@ -11,26 +11,24 @@ import {
   useEditPaymentMutation,
   usePaymentsQuery,
 } from "../Administration/Api/Queries/PaymentsQueries";
-import {
-  Months,
-  formatDateToDDMMYYYY,
-  formatDateToYYYYMMDD,
-} from "../Types/utils";
+import { formatDateToDDMMYYYY, formatDateToYYYYMMDD } from "../Types/utils";
 import { DeleteConfirmModal } from "./Shared/DeleteConfirmModal";
+import { ReceiptModal } from "./Shared/ReceiptModal";
 
 export const Payments: FC = () => {
   const { payments } = usePaymentsQuery(true);
+  const [currentPayment, setCurrentPayment] = useState<Payment>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [receiptModalOpen, setReceiptModalOpen] = useState(false);
   const {
     mutateAsync: deletePayment,
     isLoading: isDeleteLoading,
     isError: isDeleteError,
   } = useDeletePaymentMutation();
 
-  const [currentPayment, setCurrentPayment] = useState<Payment>(null);
-
+  console.log(payments);
   return (
     <div>
       <div className="flex items-center justify-center mt-5">
@@ -52,6 +50,7 @@ export const Payments: FC = () => {
             <th className="border p-2">Data do Pagamento</th>
             <th className="border p-2">Mes</th>
             <th className="border p-2">Ano</th>
+            <th className="border p-2">Comprovante</th>
             <th className="border p-2 w-1"></th>
             <th className="border p-2 w-1"></th>
           </tr>
@@ -69,7 +68,18 @@ export const Payments: FC = () => {
               </td>
               <td className="border p-2">{p.referenceMonth}</td>
               <td className="border p-2">{p.referenceYear}</td>
-              <td className="border p-2">{p.receipt}</td>
+              <td className="border p-2">
+                <button
+                  className={"font-bold py-1 px-2 rounded hover:bg-gray-300"}
+                  style={!p.hasReceipt ? { color: "red" } : { color: "green" }}
+                  onClick={() => {
+                    setCurrentPayment(p);
+                    setReceiptModalOpen(true);
+                  }}
+                >
+                  {p.hasReceipt ? "Comprovante" : "Sem Comprovante"}
+                </button>
+              </td>
               <td className="border p-2">
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
@@ -102,6 +112,11 @@ export const Payments: FC = () => {
         setOpen={setEditModalOpen}
         currentPayment={currentPayment}
       />
+      <ReceiptModal
+        open={receiptModalOpen}
+        setOpen={setReceiptModalOpen}
+        payment={currentPayment}
+      />
 
       {deleteModalOpen && (
         <DeleteConfirmModal
@@ -125,7 +140,6 @@ type PaymentFormProps = {
     dateOfPayment: Date,
     referenceMonth: number,
     referenceYear: string,
-    receipt?: string,
     id?: string
   ) => Promise<unknown>;
   isLoading: boolean;
@@ -151,7 +165,6 @@ export const PaymentForm: FC<PaymentFormProps> = ({
   const [year, setYear] = useState(
     currentPayment?.referenceYear || new Date().getFullYear().toString()
   );
-  const [receipt, setReceipt] = useState(currentPayment?.receipt || "");
   const [showValidationmessages, setShowValidationMessages] = useState(false);
 
   const allValid =
@@ -163,7 +176,6 @@ export const PaymentForm: FC<PaymentFormProps> = ({
     setDateOfPayment(new Date(Date.now()).toString());
     setMonth(0);
     setYear("");
-    setReceipt("");
   };
 
   const onSubmitClick = async () => {
@@ -175,7 +187,6 @@ export const PaymentForm: FC<PaymentFormProps> = ({
         new Date(dateOfPayment),
         month,
         year,
-        receipt,
         currentPayment?.id
       );
       if (!isError) {
@@ -277,20 +288,6 @@ export const PaymentForm: FC<PaymentFormProps> = ({
             <p className="text-red-500">O ano é necessário</p>
           )}
         </div>
-        <div className="flex flex-col w-2/5">
-          <label htmlFor="receipt" className="text-gray-700 font-bold mb-1">
-            Comprovante:
-          </label>
-          <input
-            type="file"
-            id="receipt"
-            accept=".png"
-            onChange={(e) => {
-              setReceipt(e.target.value);
-              console.log(receipt);
-            }}
-          />
-        </div>
       </div>
       <div className="flex justify-center items-center mt-5 flex-col">
         <div className="flex w-1/2 justify-center gap-10">
@@ -336,8 +333,7 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({ open, setOpen }) => {
     amount: number,
     dateOfPayment: Date,
     referenceMonth: number,
-    referenceYear: string,
-    receipt?: string
+    referenceYear: string
   ) => {
     await addPayment({
       tenantId,
@@ -345,7 +341,6 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({ open, setOpen }) => {
       dateOfPayment,
       referenceMonth,
       referenceYear,
-      receipt,
     });
     !isError && setOpen(false);
   };
@@ -414,7 +409,6 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
     dateOfPayment: Date,
     referenceMonth: number,
     referenceYear: string,
-    receipt?: string,
     id?: string
   ) => {
     await editPayment({
@@ -423,7 +417,6 @@ const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
       dateOfPayment,
       referenceMonth,
       referenceYear,
-      receipt,
       id,
     });
     !isError && setOpen(false);

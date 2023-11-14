@@ -17,8 +17,6 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   isLoading,
   isError,
 }) => {
-  console.log(isError);
-
   const onDeleteConfirm = async () => {
     await onConfirm();
     !isError && setOpen(false);

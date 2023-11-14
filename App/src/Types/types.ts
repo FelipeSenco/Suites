@@ -48,7 +48,7 @@ type Payment = {
   dateOfPayment: Date;
   referenceMonth: number;
   referenceYear: string;
-  receipt?: string;
+  hasReceipt: boolean;
 };
 
 type AddPaymentData = {
@@ -57,7 +57,6 @@ type AddPaymentData = {
   dateOfPayment: Date;
   referenceMonth: number;
   referenceYear: string;
-  receipt?: string;
 };
 
 type EditPaymentData = {
@@ -67,5 +66,9 @@ type EditPaymentData = {
   dateOfPayment: Date;
   referenceMonth: number;
   referenceYear: string;
-  receipt?: string;
+};
+
+type Receipt = {
+  id: string;
+  image: string;
 };

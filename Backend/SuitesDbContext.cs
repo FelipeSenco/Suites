@@ -8,6 +8,7 @@ namespace Suites
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<Property> Properties { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<PaymentProjection> PaymentsProjections { get; set; }
 
         public SuitesDbContext(DbContextOptions<SuitesDbContext> options) : base(options)
         {

@@ -63,6 +63,37 @@ export const useDeletePaymentMutation = () => {
   });
 };
 
+export const useReceiptQuery = (paymentId: string, enabled = false) => {
+  const { getReceipt } = useContext(PaymentsContext);
+
+  const { data, isError, isLoading, refetch } = useQuery(
+    [paymentKeys.receipt, paymentId],
+    () => getReceipt(paymentId),
+    {
+      enabled,
+      initialData: {} as Receipt,
+      onError: (error: Error) => console.log(error),
+    }
+  );
+  const receipt = data as Receipt;
+  return { receipt, isError, isLoading, refetch };
+};
+
+export const useAddReceiptMutation = () => {
+  const { addReceipt } = usePaymentsContext();
+  const { refetch } = usePaymentsQuery();
+
+  return useMutation(addReceipt, {
+    onError: (error: Error) => {
+      console.log(error);
+    },
+    onSuccess: (data, args, context) => {
+      refetch();
+    },
+  });
+};
+
 export const paymentKeys = {
   payments: "payments",
+  receipt: "receipt",
 };

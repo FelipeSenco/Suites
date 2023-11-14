@@ -9,6 +9,7 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
+
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Properties')
 BEGIN
     CREATE TABLE Properties
@@ -67,3 +68,7 @@ BEGIN
     )
     WITH (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.PaymentsHistory));
 END;
+
+
+
+

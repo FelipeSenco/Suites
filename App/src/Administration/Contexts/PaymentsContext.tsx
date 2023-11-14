@@ -6,6 +6,8 @@ type PaymentsContextType = {
   editPayment: (data: EditPaymentData) => Promise<string>;
   getPayments: () => Promise<Payment[]>;
   deletePayment: (id: string) => Promise<string>;
+  addReceipt: (data: Receipt) => Promise<string>;
+  getReceipt: (id: string) => Promise<Receipt>;
 };
 
 const PaymentsContext = createContext<PaymentsContextType>(
@@ -37,6 +39,14 @@ export const PaymentsProvider: React.FC<PaymentsProviderProps> = ({
     return api.deletePayment(id);
   };
 
+  const addReceipt = (data: Receipt): Promise<string> => {
+    return api.addReceipt(data);
+  };
+
+  const getReceipt = (id: string): Promise<Receipt> => {
+    return api.getReceipt(id);
+  };
+
   return (
     <PaymentsContext.Provider
       value={{
@@ -44,6 +54,8 @@ export const PaymentsProvider: React.FC<PaymentsProviderProps> = ({
         getPayments,
         editPayment,
         deletePayment,
+        addReceipt,
+        getReceipt,
       }}
     >
       {children}

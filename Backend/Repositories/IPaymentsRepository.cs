@@ -4,7 +4,7 @@ namespace Suites.Repositories
 {
     public interface IPaymentRepository
     {
-        public Task<List<Payment>> GetPayments();
+        public Task<List<PaymentProjection>> GetPayments();
         public Task<string> GetPaymentReceipt(Guid paymentId);
         public Task AddPayment(Payment payment);
         public Task EditPayment(Payment payment);

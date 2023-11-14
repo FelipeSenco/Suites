@@ -23,8 +23,7 @@ namespace Suites.Services
                 Amount = payment.Amount,
                 DateOfPayment = payment.DateOfPayment,
                 ReferenceMonth = payment.ReferenceMonth,
-                ReferenceYear = payment.ReferenceYear,
-                Receipt = !string.IsNullOrWhiteSpace(payment.Receipt) ? payment.Receipt : null,              
+                ReferenceYear = payment.ReferenceYear,                         
             };
             await _paymenRepository.AddPayment(dbPayment);
             return newGuid;
@@ -56,27 +55,7 @@ namespace Suites.Services
 
         public async Task<List<PaymentProjection>> GetPayments()
         {
-            var result = new List<PaymentProjection>();
-            var dbPayments = await _paymenRepository.GetPayments();
-            dbPayments.ForEach(payment =>
-            {
-                var projection = new PaymentProjection()
-                {
-                    Id = payment.Id,
-                    TenantId = payment.TenantId,
-                    TenantName = payment.Tenant.Name,
-                    TenantLastName = payment.Tenant.LastName,
-                    PropertyName = payment.Tenant.Property.Name,
-                    RoomNumber = payment.Tenant.RoomNumber,
-                    Amount = payment.Amount,
-                    DateOfPayment = payment.DateOfPayment,
-                    ReferenceMonth = payment.ReferenceMonth,
-                    ReferenceYear = payment.ReferenceYear,
-                    Receipt = payment.Receipt,
-                };
-                result.Add(projection);
-            });
-            return result;
+            return await _paymenRepository.GetPayments();
         }
     }
 }
