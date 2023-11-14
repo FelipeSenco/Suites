@@ -22,7 +22,11 @@ namespace Suites
 
             modelBuilder.Entity<Property>()
                 .HasMany(p => p.Tenants)
-                .WithOne(t => t.Property);          
+                .WithOne(t => t.Property);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.Tenant)
+                .WithMany(t => t.Payments);
         }
 
     }

@@ -34,4 +34,6 @@ public class Tenant
 
     [ForeignKey("PropertyId")]
     public virtual Property Property { get; set; }
+
+    public virtual ICollection<Payment> Payments { get; set; }
 }

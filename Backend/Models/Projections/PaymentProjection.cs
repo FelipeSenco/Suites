@@ -2,9 +2,9 @@
 
 public class PaymentProjection
 {
-    public string Id { get; set; }
+    public Guid Id { get; set; }
 
-    public string TenantId { get; set; }
+    public Guid TenantId { get; set; }
 
     public string TenantName { get; set; }
 
@@ -12,7 +12,7 @@ public class PaymentProjection
 
     public string PropertyName { get; set; }
 
-    public string RoomNumber { get; set; }
+    public int RoomNumber { get; set; }
 
     public decimal Amount { get; set; }
 

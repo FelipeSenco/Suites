@@ -59,3 +59,13 @@ type AddPaymentData = {
   referenceYear: string;
   receipt?: string;
 };
+
+type EditPaymentData = {
+  id: string;
+  tenantId: string;
+  amount: number;
+  dateOfPayment: Date;
+  referenceMonth: number;
+  referenceYear: string;
+  receipt?: string;
+};

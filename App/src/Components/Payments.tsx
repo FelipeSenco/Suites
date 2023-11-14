@@ -1,15 +1,35 @@
-import React, { FC, SetStateAction, useEffect, useState } from "react";
+import React, { FC, SetStateAction, useState } from "react";
 
 import { useTenantsQuery } from "../Administration/Api/Queries/TenantQueries";
 import MonthSelect from "./Shared/MonthSelect";
 import YearSelect from "./Shared/YearsSelect";
 import ReactModal from "react-modal";
 import { AddTenantLoadingSkeleton } from "./Tenants";
-import { useAddPaymentMutation } from "../Administration/Api/Queries/PaymentsQueries";
+import {
+  useAddPaymentMutation,
+  useDeletePaymentMutation,
+  useEditPaymentMutation,
+  usePaymentsQuery,
+} from "../Administration/Api/Queries/PaymentsQueries";
+import {
+  Months,
+  formatDateToDDMMYYYY,
+  formatDateToYYYYMMDD,
+} from "../Types/utils";
+import { DeleteConfirmModal } from "./Shared/DeleteConfirmModal";
 
 export const Payments: FC = () => {
-  const payments: Payment[] = [];
+  const { payments } = usePaymentsQuery(true);
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const {
+    mutateAsync: deletePayment,
+    isLoading: isDeleteLoading,
+    isError: isDeleteError,
+  } = useDeletePaymentMutation();
+
+  const [currentPayment, setCurrentPayment] = useState<Payment>(null);
 
   return (
     <div>
@@ -27,28 +47,34 @@ export const Payments: FC = () => {
             <th className="border p-2">Nome</th>
             <th className="border p-2">Sobrenome</th>
             <th className="border p-2">Imovel</th>
+            <th className="border p-2">Quarto</th>
             <th className="border p-2">Valor</th>
-            <th className="border p-2">DataDoPagamento</th>
-            <th className="border p-2">ReferenteMes</th>
-            <th className="border p-2">ReferenteAno</th>
+            <th className="border p-2">Data do Pagamento</th>
+            <th className="border p-2">Mes</th>
+            <th className="border p-2">Ano</th>
             <th className="border p-2 w-1"></th>
             <th className="border p-2 w-1"></th>
           </tr>
         </thead>
         <tbody>
-          {/* {payments.map((t) => (
-            <tr key={t.id}>
-              <td className="border p-2">{t.name}</td>
-              <td className="border p-2">{t.lastName}</td>
-              <td className="border p-2">{t.email}</td>
-              <td className="border p-2">{t.cellPhone}</td>
-              <td className="border p-2">{getPropertyName(t.propertyId)}</td>
-              <td className="border p-2">{t.roomNumber}</td>
+          {payments.map((p) => (
+            <tr key={p.id}>
+              <td className="border p-2">{p.tenantName}</td>
+              <td className="border p-2">{p.tenantLastName}</td>
+              <td className="border p-2">{p.propertyName}</td>
+              <td className="border p-2">{p.roomNumber}</td>
+              <td className="border p-2">R$ {p.amount}</td>
+              <td className="border p-2">
+                {formatDateToDDMMYYYY(p.dateOfPayment)}
+              </td>
+              <td className="border p-2">{p.referenceMonth}</td>
+              <td className="border p-2">{p.referenceYear}</td>
+              <td className="border p-2">{p.receipt}</td>
               <td className="border p-2">
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
                   onClick={() => {
-                    setCurrentTenant(t);
+                    setCurrentPayment(p);
                     setEditModalOpen(true);
                   }}
                 >
@@ -58,7 +84,7 @@ export const Payments: FC = () => {
               <td className="border p-2">
                 <button
                   onClick={() => {
-                    setCurrentTenant(t);
+                    setCurrentPayment(p);
                     setDeleteModalOpen(true);
                   }}
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
@@ -67,20 +93,25 @@ export const Payments: FC = () => {
                 </button>
               </td>
             </tr>
-          ))} */}
+          ))}
         </tbody>
       </table>
       <AddPaymentModal open={addModalOpen} setOpen={setAddModalOpen} />
+      <EditPaymentModal
+        open={editModalOpen}
+        setOpen={setEditModalOpen}
+        currentPayment={currentPayment}
+      />
 
-      {/* {deleteModalOpen && (
+      {deleteModalOpen && (
         <DeleteConfirmModal
           open={deleteModalOpen}
           setOpen={setDeleteModalOpen}
           isLoading={isDeleteLoading}
           isError={isDeleteError}
-          onConfirm={() => deleteTenant(currentTenant.id)}
+          onConfirm={() => deletePayment(currentPayment.id)}
         />
-      )} */}
+      )}
     </div>
   );
 };
@@ -112,9 +143,11 @@ export const PaymentForm: FC<PaymentFormProps> = ({
   const [tenantId, setTenantId] = useState(currentPayment?.tenantId || "");
   const [amount, setAmount] = useState(currentPayment?.amount || 0);
   const [dateOfPayment, setDateOfPayment] = useState(
-    currentPayment?.dateOfPayment || ""
+    formatDateToYYYYMMDD(currentPayment?.dateOfPayment) || ""
   );
-  const [month, setMonth] = useState(currentPayment?.referenceMonth || 1);
+  const [month, setMonth] = useState(
+    currentPayment?.referenceMonth || new Date().getMonth() + 1
+  );
   const [year, setYear] = useState(
     currentPayment?.referenceYear || new Date().getFullYear().toString()
   );
@@ -127,7 +160,7 @@ export const PaymentForm: FC<PaymentFormProps> = ({
   const resetForm = () => {
     setTenantId("");
     setAmount(0);
-    setDateOfPayment(new Date(Date.now()));
+    setDateOfPayment(new Date(Date.now()).toString());
     setMonth(0);
     setYear("");
     setReceipt("");
@@ -151,6 +184,7 @@ export const PaymentForm: FC<PaymentFormProps> = ({
       }
     }
   };
+  console.log(dateOfPayment);
 
   if (isLoading) return <AddTenantLoadingSkeleton />;
 
@@ -227,9 +261,8 @@ export const PaymentForm: FC<PaymentFormProps> = ({
             name="dateOfPayment"
             required
             className="border rounded p-2 w-full focus:border-blue-500"
-            placeholder="Data do pagamento"
-            value={dateOfPayment.toString()}
-            onChange={(e) => setDateOfPayment(e.target.value.toString())}
+            value={dateOfPayment}
+            onChange={(e) => setDateOfPayment(e.target.value)}
           />
           {showValidationmessages && !dateOfPayment && (
             <p className="text-red-500">A data é necessária</p>
@@ -348,6 +381,85 @@ const AddPaymentModal: React.FC<AddPaymentModalProps> = ({ open, setOpen }) => {
         <p className="py-5">Adicionar inquilino:</p>
         <PaymentForm
           currentPayment={null}
+          onCancel={() => setOpen(false)}
+          onSubmit={onSubmitClick}
+          isLoading={isLoading}
+          isError={isError}
+        />
+      </div>
+    </ReactModal>
+  );
+};
+
+type EditPaymentModalProps = {
+  open: boolean;
+  setOpen: React.Dispatch<SetStateAction<boolean>>;
+  currentPayment: Payment;
+};
+
+const EditPaymentModal: React.FC<EditPaymentModalProps> = ({
+  open,
+  setOpen,
+  currentPayment,
+}) => {
+  const {
+    mutateAsync: editPayment,
+    isError,
+    isLoading,
+  } = useEditPaymentMutation();
+
+  const onSubmitClick = async (
+    tenantId: string,
+    amount: number,
+    dateOfPayment: Date,
+    referenceMonth: number,
+    referenceYear: string,
+    receipt?: string,
+    id?: string
+  ) => {
+    await editPayment({
+      tenantId,
+      amount,
+      dateOfPayment,
+      referenceMonth,
+      referenceYear,
+      receipt,
+      id,
+    });
+    !isError && setOpen(false);
+  };
+
+  return (
+    <ReactModal
+      isOpen={open}
+      style={{
+        overlay: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+        content: {
+          position: "relative",
+          overflow: "auto",
+          WebkitOverflowScrolling: "touch",
+          outline: "none",
+          padding: "20px",
+          border: "1px solid #ccc",
+          borderRadius: "4px",
+          background: "#fff",
+          top: "auto",
+          left: "auto",
+          right: "auto",
+          bottom: "auto",
+          width: "80%",
+          height: "50%",
+        },
+      }}
+    >
+      <div className="h-48">
+        <p className="py-5">Adicionar inquilino:</p>
+        <PaymentForm
+          currentPayment={currentPayment}
           onCancel={() => setOpen(false)}
           onSubmit={onSubmitClick}
           isLoading={isLoading}

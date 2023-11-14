@@ -26,7 +26,10 @@ namespace Suites.Models
         [StringLength(5)]
         public string ReferenceYear { get; set; }
 
-        public string Receipt { get; set; }  // This will store the base64 encoded image
-    
+        public string? Receipt { get; set; }  // This will store the base64 encoded image
+
+        [ForeignKey("TenantId")]
+        public virtual Tenant Tenant { get; set; }
+
     }
 }

@@ -55,7 +55,7 @@ namespace Suites.Services
         }            
         public async Task DeleteTenant(Guid tenantId)
         {
-            await _tenantsRepository.DeleteTenant(tenantId);
+            await _tenantsRepository.DeleteTenant(tenantId);           
         }
 
         public async Task EditTenant(EditTenant tenant)

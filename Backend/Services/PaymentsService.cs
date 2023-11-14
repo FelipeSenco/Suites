@@ -1,6 +1,7 @@
 ﻿using Suites.Models;
 using Suites.Models.Api;
 using Suites.Repositories;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Suites.Services
 {
@@ -29,14 +30,23 @@ namespace Suites.Services
             return newGuid;
         }
 
-        public Task DeletePayment(Guid paymentId)
+        public async Task DeletePayment(Guid paymentId)
         {
-            throw new NotImplementedException();
+            await _paymenRepository.DeletePayment(paymentId);
         }
 
-        public Task EditPayment(EditPayment payment)
+        public async Task EditPayment(EditPayment payment)
         {
-            throw new NotImplementedException();
+            var dbPayment = new Payment()
+            {
+                Id = payment.Id,
+                TenantId = payment.TenantId,
+                Amount = payment.Amount,
+                DateOfPayment = payment.DateOfPayment,
+                ReferenceMonth = payment.ReferenceMonth,
+                ReferenceYear = payment.ReferenceYear,
+            };
+            await _paymenRepository.EditPayment(dbPayment);
         }
 
         public Task<string> GetPaymentReceipt(Guid paymentId)
@@ -44,9 +54,29 @@ namespace Suites.Services
             throw new NotImplementedException();
         }
 
-        public Task<List<PaymentProjection>> GetPayments()
+        public async Task<List<PaymentProjection>> GetPayments()
         {
-            throw new NotImplementedException();
+            var result = new List<PaymentProjection>();
+            var dbPayments = await _paymenRepository.GetPayments();
+            dbPayments.ForEach(payment =>
+            {
+                var projection = new PaymentProjection()
+                {
+                    Id = payment.Id,
+                    TenantId = payment.TenantId,
+                    TenantName = payment.Tenant.Name,
+                    TenantLastName = payment.Tenant.LastName,
+                    PropertyName = payment.Tenant.Property.Name,
+                    RoomNumber = payment.Tenant.RoomNumber,
+                    Amount = payment.Amount,
+                    DateOfPayment = payment.DateOfPayment,
+                    ReferenceMonth = payment.ReferenceMonth,
+                    ReferenceYear = payment.ReferenceYear,
+                    Receipt = payment.Receipt,
+                };
+                result.Add(projection);
+            });
+            return result;
         }
     }
 }

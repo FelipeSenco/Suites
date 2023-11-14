@@ -32,7 +32,7 @@ namespace Suites.Repositories
                 throw new Exception("No tenant found for the provided id.");
             }
              _context.Tenants.Remove(removeTenant);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();         
         }
 
         public async Task EditTenant(Tenant tenant)
