@@ -28,7 +28,6 @@ export const Payments: FC = () => {
     isError: isDeleteError,
   } = useDeletePaymentMutation();
 
-  console.log(payments);
   return (
     <div>
       <div className="flex items-center justify-center mt-5">
@@ -106,17 +105,23 @@ export const Payments: FC = () => {
           ))}
         </tbody>
       </table>
-      <AddPaymentModal open={addModalOpen} setOpen={setAddModalOpen} />
-      <EditPaymentModal
-        open={editModalOpen}
-        setOpen={setEditModalOpen}
-        currentPayment={currentPayment}
-      />
-      <ReceiptModal
-        open={receiptModalOpen}
-        setOpen={setReceiptModalOpen}
-        payment={currentPayment}
-      />
+      {addModalOpen && (
+        <AddPaymentModal open={addModalOpen} setOpen={setAddModalOpen} />
+      )}
+      {editModalOpen && (
+        <EditPaymentModal
+          open={editModalOpen}
+          setOpen={setEditModalOpen}
+          currentPayment={currentPayment}
+        />
+      )}
+      {receiptModalOpen && (
+        <ReceiptModal
+          open={receiptModalOpen}
+          setOpen={setReceiptModalOpen}
+          payment={currentPayment}
+        />
+      )}
 
       {deleteModalOpen && (
         <DeleteConfirmModal
@@ -195,7 +200,6 @@ export const PaymentForm: FC<PaymentFormProps> = ({
       }
     }
   };
-  console.log(dateOfPayment);
 
   if (isLoading) return <AddTenantLoadingSkeleton />;
 

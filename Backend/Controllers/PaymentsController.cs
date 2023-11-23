@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Suites.Models;
 using Suites.Models.Api;
 using Suites.Services;
 
@@ -68,6 +69,36 @@ namespace Suites.Controllers
                 return Ok("Payment deleted");
             }
             catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("receipt")]
+        public async Task<IActionResult> GetPaymentReceipt([FromQuery] Guid id)
+        {
+            try
+            {
+                var receipt = await _paymentService.GetPaymentReceipt(id);
+                return Ok(receipt);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("receipt/add")]
+        public async Task<IActionResult> AddPaymentReceipt([FromBody] PaymentReceipt receipt)
+        {
+            try
+            {
+                await _paymentService.AddPaymentReceipt(receipt);
+                return Ok("Receipt added");
+            }
+            catch(Exception ex)
             {
                 return BadRequest(ex.Message);
             }

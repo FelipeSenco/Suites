@@ -1,4 +1,4 @@
-import React, { FC, SetStateAction, useState } from "react";
+import React, { ChangeEvent, FC, SetStateAction, useState } from "react";
 import ReactModal from "react-modal";
 import { LoadingWheel } from "./LoadingWheel";
 import {
@@ -24,7 +24,28 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
     isLoading: isMutationLoading,
   } = useAddReceiptMutation();
 
-  const [newReceipt, setNewReceipt] = useState("");
+  const [newReceiptImage, setNewReceiptImage] = useState("");
+
+  const onUpdate = async () => {
+    await addReceipt({ id: payment.id, image: newReceiptImage });
+    !isError && setOpen(false);
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64 = (reader.result as string).split(",")[1];
+        setNewReceiptImage(base64);
+      };
+      reader.onerror = (error) => {
+        console.error("Error: ", error);
+      };
+    }
+  };
+
   return (
     <ReactModal
       isOpen={open}
@@ -47,6 +68,8 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
           left: "auto",
           right: "auto",
           bottom: "auto",
+          height: "600px",
+          width: "700px",
         },
       }}
     >
@@ -54,8 +77,16 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
         {isLoading ? (
           <LoadingWheel />
         ) : (
-          <div className="flex flex-col justify-between gap-5">
-            <img src={receipt?.image} />
+          <div className="flex flex-col justify-between items-center gap-5 overflow-y-auto">
+            <img
+              className="w-1/2 h-1/2"
+              src={
+                newReceiptImage?.length > 0
+                  ? `data:image/png;base64,${newReceiptImage}`
+                  : `data:image/png;base64,${receipt?.image}`
+              }
+              alt="No image"
+            />
             {!receipt?.image && !isError && (
               <p>Não existe imagem de recibo associado a esse pagamento.</p>
             )}
@@ -65,6 +96,7 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
                 tente novamente.
               </p>
             )}
+
             <div className="flex flex-col bg-gray-200 p-2 ">
               <label htmlFor="receipt" className="text-gray-700 font-bold mb-1">
                 Atualizar Comprovante
@@ -72,14 +104,11 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
               <input
                 type="file"
                 id="receipt"
-                accept=".png"
-                onChange={(e) => {
-                  setNewReceipt(e.target.value);
-                  console.log(e);
-                }}
+                accept="image/png, image/jpeg"
+                onChange={handleFileChange}
               />
             </div>
-            <div className="flex justify-between gap-3">
+            <div className="flex justify-between gap-3 w-full">
               <button
                 onClick={() => setOpen(false)}
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
@@ -88,13 +117,11 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
                 Fechar
               </button>
               <button
-                onClick={() => {
-                  console.log({ id: payment.id, image: newReceipt });
-                }}
+                onClick={onUpdate}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
-                disabled={isLoading}
+                disabled={isLoading || newReceiptImage.length === 0}
               >
-                {receipt ? "Editar" : "Adicionar"}
+                {receipt.image ? "Editar" : "Adicionar"}
               </button>
             </div>
           </div>

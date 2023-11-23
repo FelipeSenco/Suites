@@ -48,14 +48,19 @@ namespace Suites.Services
             await _paymenRepository.EditPayment(dbPayment);
         }
 
-        public Task<string> GetPaymentReceipt(Guid paymentId)
+        public async Task<PaymentReceipt> GetPaymentReceipt(Guid paymentId)
         {
-            throw new NotImplementedException();
-        }
+            return await _paymenRepository.GetPaymentReceipt(paymentId);
+        }     
 
         public async Task<List<PaymentProjection>> GetPayments()
         {
             return await _paymenRepository.GetPayments();
+        }
+
+        public async Task AddPaymentReceipt(PaymentReceipt receipt)
+        {
+            await _paymenRepository.AddPaymentReceipt(receipt);
         }
     }
 }

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import PaymentsContext, {
   usePaymentsContext,
 } from "../../Contexts/PaymentsContext";
@@ -81,14 +81,24 @@ export const useReceiptQuery = (paymentId: string, enabled = false) => {
 
 export const useAddReceiptMutation = () => {
   const { addReceipt } = usePaymentsContext();
-  const { refetch } = usePaymentsQuery();
+  const queryClient = useQueryClient();
 
   return useMutation(addReceipt, {
     onError: (error: Error) => {
       console.log(error);
     },
     onSuccess: (data, args, context) => {
-      refetch();
+      queryClient.setQueryData([paymentKeys.payments], (oldData: Payment[]) =>
+        oldData.map((p) =>
+          p.id === args.id ? { ...p, receipt: args.image } : p
+        )
+      );
+      queryClient.setQueryData(
+        [paymentKeys.receipt, args.id],
+        (oldData: Receipt) => {
+          return { ...oldData, image: args.image };
+        }
+      );
     },
   });
 };

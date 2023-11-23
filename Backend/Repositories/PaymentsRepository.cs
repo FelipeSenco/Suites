@@ -15,7 +15,7 @@ namespace Suites.Repositories
         {
             await _context.Payments.AddAsync(payment);
             await _context.SaveChangesAsync();
-        }
+        }       
 
         public async Task DeletePayment(Guid paymentId)
         {
@@ -47,14 +47,40 @@ namespace Suites.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public Task<string> GetPaymentReceipt(Guid paymentId)
+        public async Task<PaymentReceipt> GetPaymentReceipt(Guid paymentId)
         {
-            throw new NotImplementedException();
+            var paymentReceipt = await _context.Payments
+            .Where(p => p.Id == paymentId)
+            .Select(p => new PaymentReceipt
+            {
+                Id = p.Id,
+                Image = p.Receipt
+            })
+            .FirstOrDefaultAsync();
+
+            if (paymentReceipt == null)
+            {
+                throw new KeyNotFoundException("Payment not found with the given ID.");
+            }
+
+            return paymentReceipt;
         }
 
         public async Task<List<PaymentProjection>> GetPayments()
         {
            return await _context.Set<PaymentProjection>().FromSqlRaw("EXEC GetPaymentsProjections").ToListAsync();
+        }
+
+        public async Task AddPaymentReceipt(PaymentReceipt paymentReceipt)
+        {
+            var currentPayment = await _context.Payments.FirstOrDefaultAsync(p => p.Id == paymentReceipt.Id);
+            if (currentPayment is null)
+            {
+                throw new Exception("No payment found for the provided id.");
+            };
+
+            currentPayment.Receipt = paymentReceipt.Image;
+            await _context.SaveChangesAsync();
         }
     }
 }
