@@ -4,7 +4,7 @@ import { PaymentsApi } from "../Api/paymentsApi";
 type PaymentsContextType = {
   addPayment: (data: AddPaymentData) => Promise<string>;
   editPayment: (data: EditPaymentData) => Promise<string>;
-  getPayments: () => Promise<Payment[]>;
+  getPayments: (pageParam?: number) => Promise<Payment[]>;
   deletePayment: (id: string) => Promise<string>;
   addReceipt: (data: Receipt) => Promise<string>;
   getReceipt: (id: string) => Promise<Receipt>;
@@ -23,8 +23,8 @@ export const PaymentsProvider: React.FC<PaymentsProviderProps> = ({
   children,
   api,
 }) => {
-  const getPayments = (): Promise<Payment[]> => {
-    return api.getPayments();
+  const getPayments = (pageParam = 1): Promise<Payment[]> => {
+    return api.getPayments(pageParam);
   };
 
   const addPayment = (data: AddPaymentData): Promise<string> => {

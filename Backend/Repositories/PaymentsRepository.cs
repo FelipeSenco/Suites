@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Suites.Models;
 
 namespace Suites.Repositories
@@ -66,9 +67,12 @@ namespace Suites.Repositories
             return paymentReceipt;
         }
 
-        public async Task<List<PaymentProjection>> GetPayments()
+        public async Task<List<PaymentProjection>> GetPayments(int? page)
         {
-           return await _context.Set<PaymentProjection>().FromSqlRaw("EXEC GetPaymentsProjections").ToListAsync();
+            return await _context.Set<PaymentProjection>()
+                          .FromSqlRaw("EXEC GetPaymentsProjections @Page",
+                                       new SqlParameter("Page", page))                                       
+                          .ToListAsync();
         }
 
         public async Task AddPaymentReceipt(PaymentReceipt paymentReceipt)

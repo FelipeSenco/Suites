@@ -16,11 +16,11 @@ namespace Suites.Controllers
         }
 
         [HttpGet]     
-        public async Task<IActionResult> GetPayments()
-        {
+        public async Task<IActionResult> GetPayments([FromQuery] int? page)
+        { 
             try
             {
-                var paymentProjections = await _paymentService.GetPayments();
+                var paymentProjections = await _paymentService.GetPayments(page);
                 return Ok(paymentProjections);
             }
             catch (Exception ex)

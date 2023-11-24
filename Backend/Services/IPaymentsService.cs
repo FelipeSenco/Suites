@@ -5,7 +5,7 @@ namespace Suites.Services
 {
     public interface IPaymentsService
     {
-        public Task<List<PaymentProjection>> GetPayments();
+        public Task<List<PaymentProjection>> GetPayments(int? page);
         public Task<PaymentReceipt> GetPaymentReceipt(Guid paymentId);
         public Task<Guid> AddPayment(AddPayment payment);
         public Task EditPayment(EditPayment payment);

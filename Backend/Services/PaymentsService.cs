@@ -53,9 +53,9 @@ namespace Suites.Services
             return await _paymenRepository.GetPaymentReceipt(paymentId);
         }     
 
-        public async Task<List<PaymentProjection>> GetPayments()
+        public async Task<List<PaymentProjection>> GetPayments(int? page)
         {
-            return await _paymenRepository.GetPayments();
+            return await _paymenRepository.GetPayments(page);
         }
 
         public async Task AddPaymentReceipt(PaymentReceipt receipt)

@@ -16,9 +16,12 @@ import { DeleteConfirmModal } from "./Shared/DeleteConfirmModal";
 import { ReceiptModal } from "./Shared/ReceiptModal";
 import PaymentsFilter from "./Shared/PaymentsFilter";
 import TenantSelect from "./Shared/TenantSelect";
+import IntersectionObserverContainer from "./Shared/IntersectionObserverContainer";
+import { LoadingWheel } from "./Shared/LoadingWheel";
 
 export const Payments: FC = () => {
-  const { payments } = usePaymentsQuery(true);
+  const { payments, hasNextPage, isFetching, fetchNextPage } =
+    usePaymentsQuery(true);
   const [currentPayment, setCurrentPayment] = useState<Payment>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -30,9 +33,11 @@ export const Payments: FC = () => {
     isError: isDeleteError,
   } = useDeletePaymentMutation();
 
+  console.log(hasNextPage);
+
   return (
-    <div>
-      <div className="flex items-center justify-center mt-5 px-4 bg-gray-100 rounded">
+    <>
+      <div className="flex items-center justify-center mt-5 px-4 bg-gray-100 rounded p-absolute">
         <PaymentsFilter />
         <button
           onClick={() => setAddModalOpen(true)}
@@ -41,101 +46,109 @@ export const Payments: FC = () => {
           Adicionar
         </button>
       </div>
-      <table className="border-collapse w-full mt-5">
-        <thead>
-          <tr>
-            <th className="border p-2">Nome</th>
-            <th className="border p-2">Sobrenome</th>
-            <th className="border p-2">Imovel</th>
-            <th className="border p-2">Quarto</th>
-            <th className="border p-2">Valor</th>
-            <th className="border p-2">Data do Pagamento</th>
-            <th className="border p-2">Mes</th>
-            <th className="border p-2">Ano</th>
-            <th className="border p-2">Comprovante</th>
-            <th className="border p-2 w-1"></th>
-            <th className="border p-2 w-1"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {payments.map((p) => (
-            <tr key={p.id}>
-              <td className="border p-2">{p.tenantName}</td>
-              <td className="border p-2">{p.tenantLastName}</td>
-              <td className="border p-2">{p.propertyName}</td>
-              <td className="border p-2">{p.roomNumber}</td>
-              <td className="border p-2">R$ {p.amount}</td>
-              <td className="border p-2">
-                {formatDateToDDMMYYYY(p.dateOfPayment)}
-              </td>
-              <td className="border p-2">{p.referenceMonth}</td>
-              <td className="border p-2">{p.referenceYear}</td>
-              <td className="border p-2">
-                <button
-                  className={"font-bold py-1 px-2 rounded hover:bg-gray-300"}
-                  style={!p.hasReceipt ? { color: "red" } : { color: "green" }}
-                  onClick={() => {
-                    setCurrentPayment(p);
-                    setReceiptModalOpen(true);
-                  }}
-                >
-                  {p.hasReceipt ? "Comprovante" : "Sem Comprovante"}
-                </button>
-              </td>
-              <td className="border p-2">
-                <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
-                  onClick={() => {
-                    setCurrentPayment(p);
-                    setEditModalOpen(true);
-                  }}
-                >
-                  Editar
-                </button>
-              </td>
-              <td className="border p-2">
-                <button
-                  onClick={() => {
-                    setCurrentPayment(p);
-                    setDeleteModalOpen(true);
-                  }}
-                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                >
-                  Deletar
-                </button>
-              </td>
+      <div className="mt-100 h-[700px] overflow-y-auto">
+        <table className="border-collapse w-full mt-5">
+          <thead>
+            <tr>
+              <th className="border p-2">Nome</th>
+              <th className="border p-2">Sobrenome</th>
+              <th className="border p-2">Imovel</th>
+              <th className="border p-2">Quarto</th>
+              <th className="border p-2">Valor</th>
+              <th className="border p-2">Data do Pagamento</th>
+              <th className="border p-2">Mes</th>
+              <th className="border p-2">Ano</th>
+              <th className="border p-2">Comprovante</th>
+              <th className="border p-2 w-1"></th>
+              <th className="border p-2 w-1"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      {addModalOpen && (
-        <AddPaymentModal open={addModalOpen} setOpen={setAddModalOpen} />
-      )}
-      {editModalOpen && (
-        <EditPaymentModal
-          open={editModalOpen}
-          setOpen={setEditModalOpen}
-          currentPayment={currentPayment}
-        />
-      )}
-      {receiptModalOpen && (
-        <ReceiptModal
-          open={receiptModalOpen}
-          setOpen={setReceiptModalOpen}
-          payment={currentPayment}
-        />
-      )}
+          </thead>
+          <tbody>
+            {payments.map((p) => (
+              <tr key={p.id}>
+                <td className="border p-2">{p.tenantName}</td>
+                <td className="border p-2">{p.tenantLastName}</td>
+                <td className="border p-2">{p.propertyName}</td>
+                <td className="border p-2">{p.roomNumber}</td>
+                <td className="border p-2">R$ {p.amount}</td>
+                <td className="border p-2">
+                  {formatDateToDDMMYYYY(p.dateOfPayment)}
+                </td>
+                <td className="border p-2">{p.referenceMonth}</td>
+                <td className="border p-2">{p.referenceYear}</td>
+                <td className="border p-2">
+                  <button
+                    className={"font-bold py-1 px-2 rounded hover:bg-gray-300"}
+                    style={
+                      !p.hasReceipt ? { color: "red" } : { color: "green" }
+                    }
+                    onClick={() => {
+                      setCurrentPayment(p);
+                      setReceiptModalOpen(true);
+                    }}
+                  >
+                    {p.hasReceipt ? "Comprovante" : "Sem Comprovante"}
+                  </button>
+                </td>
+                <td className="border p-2">
+                  <button
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+                    onClick={() => {
+                      setCurrentPayment(p);
+                      setEditModalOpen(true);
+                    }}
+                  >
+                    Editar
+                  </button>
+                </td>
+                <td className="border p-2">
+                  <button
+                    onClick={() => {
+                      setCurrentPayment(p);
+                      setDeleteModalOpen(true);
+                    }}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
+                  >
+                    Deletar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {isFetching && <LoadingWheel />}
+        {hasNextPage && (
+          <IntersectionObserverContainer handleIntersection={fetchNextPage} />
+        )}
+        {addModalOpen && (
+          <AddPaymentModal open={addModalOpen} setOpen={setAddModalOpen} />
+        )}
+        {editModalOpen && (
+          <EditPaymentModal
+            open={editModalOpen}
+            setOpen={setEditModalOpen}
+            currentPayment={currentPayment}
+          />
+        )}
+        {receiptModalOpen && (
+          <ReceiptModal
+            open={receiptModalOpen}
+            setOpen={setReceiptModalOpen}
+            payment={currentPayment}
+          />
+        )}
 
-      {deleteModalOpen && (
-        <DeleteConfirmModal
-          open={deleteModalOpen}
-          setOpen={setDeleteModalOpen}
-          isLoading={isDeleteLoading}
-          isError={isDeleteError}
-          onConfirm={() => deletePayment(currentPayment.id)}
-        />
-      )}
-    </div>
+        {deleteModalOpen && (
+          <DeleteConfirmModal
+            open={deleteModalOpen}
+            setOpen={setDeleteModalOpen}
+            isLoading={isDeleteLoading}
+            isError={isDeleteError}
+            onConfirm={() => deletePayment(currentPayment.id)}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

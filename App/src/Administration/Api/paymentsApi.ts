@@ -8,7 +8,7 @@ export class PaymentsApi {
     this.apiUrl = "https://localhost:7255";
     this.endpoints = {
       addPayment: this.apiUrl + "/api/payments/add",
-      getPayments: this.apiUrl + "/api/payments",
+      getPayments: this.apiUrl + "/api/payments?page={page}",
       editPayment: this.apiUrl + "/api/payments/edit",
       deletePayment: this.apiUrl + "/api/payments/delete?id={id}",
       getReceipt: this.apiUrl + "/api/payments/receipt?id={id}",
@@ -16,8 +16,13 @@ export class PaymentsApi {
     };
   }
 
-  async getPayments(): Promise<Payment[]> {
-    const response = await axios.get(this.endpoints.getPayments);
+  async getPayments(pageParam: number): Promise<Payment[]> {
+    const response = await axios.get(
+      this.endpoints.getPayments.replace(
+        "{page}",
+        encodeURIComponent(pageParam)
+      )
+    );
     return response.data;
   }
 

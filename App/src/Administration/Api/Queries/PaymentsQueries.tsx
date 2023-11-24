@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "react-query";
 import PaymentsContext, {
   usePaymentsContext,
 } from "../../Contexts/PaymentsContext";
@@ -7,18 +12,36 @@ import { useContext } from "react";
 export const usePaymentsQuery = (enabled = false) => {
   const { getPayments } = useContext(PaymentsContext);
 
-  const { data, isError, isLoading, refetch } = useQuery(
+  const {
+    data,
+    isError,
+    isFetching,
+    isFetchingNextPage,
+    refetch,
+    fetchNextPage,
+  } = useInfiniteQuery(
     [paymentKeys.payments],
-    getPayments,
+    async ({ pageParam }) => getPayments(pageParam),
     {
+      getNextPageParam: (lastPage, pages) => pages.length + 1,
       enabled,
-      initialData: [] as Payment[],
       onError: (error: Error) => console.log(error),
     }
   );
 
-  const payments = data as Payment[];
-  return { payments, isError, isLoading, refetch };
+  const payments = data?.pages.flat() || [];
+  const hasNextPage = data?.pages[data?.pages.length - 1]?.length === 15;
+
+  return {
+    payments,
+    data,
+    isError,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    refetch,
+    fetchNextPage,
+  };
 };
 
 export const useAddPaymentMutation = () => {
