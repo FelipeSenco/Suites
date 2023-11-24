@@ -11,6 +11,7 @@ public class PaymentProjection
     public string TenantLastName { get; set; }
 
     public string PropertyName { get; set; }
+    public Guid PropertyId { get; set; }
 
     public int RoomNumber { get; set; }
 

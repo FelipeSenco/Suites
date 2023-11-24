@@ -14,6 +14,8 @@ import {
 import { formatDateToDDMMYYYY, formatDateToYYYYMMDD } from "../Types/utils";
 import { DeleteConfirmModal } from "./Shared/DeleteConfirmModal";
 import { ReceiptModal } from "./Shared/ReceiptModal";
+import PaymentsFilter from "./Shared/PaymentsFilter";
+import TenantSelect from "./Shared/TenantSelect";
 
 export const Payments: FC = () => {
   const { payments } = usePaymentsQuery(true);
@@ -30,7 +32,8 @@ export const Payments: FC = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-center mt-5">
+      <div className="flex items-center justify-center mt-5 px-4 bg-gray-100 rounded">
+        <PaymentsFilter />
         <button
           onClick={() => setAddModalOpen(true)}
           className="bg-green-500 hover:bg-green-700 text-white font-bold text-lg py-2 px-8 rounded"
@@ -211,24 +214,11 @@ export const PaymentForm: FC<PaymentFormProps> = ({
             <label htmlFor="tenant" className="text-gray-700 font-bold mb-1">
               Imovel
             </label>
-            <select
-              className="border rounded p-2 w-full focus:border-blue-500"
-              id="tenant"
-              onChange={(e) => {
-                setTenantId(e.currentTarget.value);
-              }}
-              value={tenantId}
-              placeholder="Escolha um inquilino"
-            >
-              <option key={"empty"} value={""}>
-                Escolha um inquilino
-              </option>
-              {tenants.map((tenant) => (
-                <option key={tenant.id} value={tenant.id}>
-                  {`${tenant.name} ${tenant.lastName}`}
-                </option>
-              ))}
-            </select>
+            <TenantSelect
+              tenantId={tenantId}
+              setTenantId={setTenantId}
+              tenants={tenants}
+            />
             {showValidationmessages && !tenantId && (
               <p className="text-red-500">Inquilino é necessário</p>
             )}

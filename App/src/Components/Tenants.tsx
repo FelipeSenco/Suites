@@ -9,6 +9,7 @@ import {
 import ReactModal from "react-modal";
 import { DeleteConfirmModal } from "./Shared/DeleteConfirmModal";
 import { usePropertiesQuery } from "../Administration/Api/Queries/PropertiesQueries";
+import PropertySelect from "./Shared/PropertySelect";
 
 export const Tenants: FC = () => {
   const { tenants } = useTenantsQuery(true);
@@ -476,24 +477,11 @@ const TenantForm: React.FC<TenantFormProps> = ({
             <label htmlFor="property" className="text-gray-700 font-bold mb-1">
               Imovel
             </label>
-            <select
-              className="border rounded p-2 w-full focus:border-blue-500"
-              id="property"
-              onChange={(e) => {
-                setPropertyId(e.currentTarget.value);
-              }}
-              value={propertyId}
-              placeholder="Escolha um imovel"
-            >
-              <option key={"empty"} value={""}>
-                Escolha um imovel
-              </option>
-              {properties.map((property) => (
-                <option key={property.id} value={property.id}>
-                  {property.name}
-                </option>
-              ))}
-            </select>
+            <PropertySelect
+              setPropertyId={setPropertyId}
+              propertyId={propertyId}
+              properties={properties}
+            />
             {showValidationmessages && !propertyId && (
               <p className="text-red-500">Imovel eh necessario</p>
             )}

@@ -42,6 +42,7 @@ type Payment = {
   tenantId: string;
   tenantName: string;
   tenantLastName: string;
+  propertyId: string;
   propertyName: string;
   roomNumber: string;
   amount: number;

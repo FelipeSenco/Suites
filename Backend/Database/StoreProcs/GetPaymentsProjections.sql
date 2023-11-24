@@ -7,6 +7,7 @@ BEGIN
         t.Name as TenantName,
         t.LastName as TenantLastName,
         prop.Name as PropertyName,
+        prop.Id as PropertyId,
         t.RoomNumber as RoomNumber,        
         p.Amount,
         p.DateOfPayment,
