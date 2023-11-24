@@ -90,7 +90,9 @@ export const useAddReceiptMutation = () => {
     onSuccess: (data, args, context) => {
       queryClient.setQueryData([paymentKeys.payments], (oldData: Payment[]) =>
         oldData.map((p) =>
-          p.id === args.id ? { ...p, receipt: args.image } : p
+          p.id === args.id
+            ? { ...p, receipt: args.image, hasReceipt: !!args?.image }
+            : p
         )
       );
       queryClient.setQueryData(

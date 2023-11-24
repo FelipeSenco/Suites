@@ -7,7 +7,7 @@ type DeleteConfirmModalProps = {
   setOpen: React.Dispatch<SetStateAction<boolean>>;
   isLoading: boolean;
   isError: boolean;
-  onConfirm: () => Promise<string>;
+  onConfirm: () => Promise<unknown>;
 };
 
 export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({

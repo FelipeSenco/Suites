@@ -5,6 +5,7 @@ import {
   useAddReceiptMutation,
   useReceiptQuery,
 } from "../../Administration/Api/Queries/PaymentsQueries";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
 
 type ReceiptModalProps = {
   open: boolean;
@@ -24,10 +25,16 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
     isLoading: isMutationLoading,
   } = useAddReceiptMutation();
 
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [newReceiptImage, setNewReceiptImage] = useState("");
 
   const onUpdate = async () => {
     await addReceipt({ id: payment.id, image: newReceiptImage });
+    !isError && setOpen(false);
+  };
+
+  const onDelete = async () => {
+    await addReceipt({ id: payment.id, image: null });
     !isError && setOpen(false);
   };
 
@@ -117,6 +124,13 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
                 Fechar
               </button>
               <button
+                onClick={() => setDeleteModalOpen(true)}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
+                disabled={isLoading || !receipt?.image?.length}
+              >
+                Deletar
+              </button>
+              <button
                 onClick={onUpdate}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-lg py-2 px-8 rounded mb-5"
                 disabled={isLoading || newReceiptImage.length === 0}
@@ -132,6 +146,15 @@ export const ReceiptModal: FC<ReceiptModalProps> = ({
           </p>
         )}
       </div>
+      {deleteModalOpen && (
+        <DeleteConfirmModal
+          open={deleteModalOpen}
+          setOpen={setDeleteModalOpen}
+          isLoading={isLoading}
+          isError={isError}
+          onConfirm={() => onDelete()}
+        />
+      )}
     </ReactModal>
   );
 };
