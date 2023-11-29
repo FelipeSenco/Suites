@@ -111,13 +111,21 @@ export const useAddReceiptMutation = () => {
       console.log(error);
     },
     onSuccess: (data, args, context) => {
-      queryClient.setQueryData([paymentKeys.payments], (oldData: Payment[]) =>
-        oldData.map((p) =>
-          p.id === args.id
-            ? { ...p, receipt: args.image, hasReceipt: !!args?.image }
-            : p
-        )
-      );
+      queryClient.setQueryData([paymentKeys.payments], (oldData: any) => {
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: Payment[]) =>
+            page.map(
+              (
+                p // Now we are dealing with an array
+              ) =>
+                p.id === args.id
+                  ? { ...p, receipt: args.image, hasReceipt: !!args?.image }
+                  : p
+            )
+          ),
+        };
+      });
       queryClient.setQueryData(
         [paymentKeys.receipt, args.id],
         (oldData: Receipt) => {

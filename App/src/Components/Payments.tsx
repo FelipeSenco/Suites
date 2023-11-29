@@ -33,8 +33,6 @@ export const Payments: FC = () => {
     isError: isDeleteError,
   } = useDeletePaymentMutation();
 
-  console.log(hasNextPage);
-
   return (
     <>
       <div className="flex items-center justify-center mt-5 px-4 bg-gray-100 rounded p-absolute">
